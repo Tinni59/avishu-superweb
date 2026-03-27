@@ -6,7 +6,10 @@
     <title>{% block title %}AVISHU MVP{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body data-user-role="{{ current_user.role if current_user.is_authenticated else '' }}">
+<body
+    data-user-role="{{ current_user.role if current_user.is_authenticated else '' }}"
+    data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}"
+>
     <header class="app-header">
         <div>
             <p class="eyebrow">AVISHU</p>
@@ -42,6 +45,7 @@
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

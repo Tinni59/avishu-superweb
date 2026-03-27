@@ -11,9 +11,10 @@
                 <h2>В работе</h2>
                 <p class="muted">Только accepted и in_production → done.</p>
             </div>
-            <span class="badge">{{ visible_orders|length }}</span>
+            <span class="badge" data-production-active-count>{{ visible_orders|length }}</span>
         </div>
 
+        <div id="production-active-wrap">
         {% if visible_orders %}
             <div class="table-wrapper">
                 <table>
@@ -27,7 +28,7 @@
                             <th>Действие</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="production-active-tbody">
                         {% for order in visible_orders %}
                         {% set allowed = next_statuses_for_production(order.status) %}
                         <tr data-order-id="{{ order.id }}">
@@ -36,7 +37,7 @@
                             <td>{{ order.type }}</td>
                             <td class="js-order-status">{{ order.status }}</td>
                             <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
-                            <td>
+                            <td class="js-production-actions">
                                 {% if allowed %}
                                 <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form">
                                     {% for s in allowed %}
@@ -55,18 +56,19 @@
         {% else %}
             <p class="empty-state">Нет заказов в работе (accepted / in_production).</p>
         {% endif %}
+        </div>
     </section>
 
     <section class="panel">
         <div class="section-header">
             <h3>Завершённые</h3>
-            <span class="badge">{{ completed_orders|length }}</span>
+            <span class="badge" data-production-done-count>{{ completed_orders|length }}</span>
         </div>
 
         {% if completed_orders %}
-            <ul class="card-list">
+            <ul class="card-list" id="production-done-list">
                 {% for order in completed_orders %}
-                <li class="list-card">
+                <li class="list-card" data-order-id="{{ order.id }}">
                     <div>
                         <strong>#{{ order.id }} — {{ order.product_name }}</strong>
                         <p class="muted">Клиент: {{ order.user.email }}</p>
@@ -76,7 +78,9 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="empty-state">Завершённых заказов пока нет.</p>
+            <ul class="card-list" id="production-done-list">
+                <li class="empty-state" style="list-style: none; padding: 0;">Завершённых заказов пока нет.</li>
+            </ul>
         {% endif %}
     </section>
 </section>

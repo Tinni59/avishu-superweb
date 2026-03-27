@@ -41,9 +41,10 @@
     <section class="card">
         <div class="section-header">
             <h3>Список заказов</h3>
-            <span class="badge">{{ orders|length }}</span>
+            <span class="badge" data-client-order-count>{{ orders|length }}</span>
         </div>
 
+        <div id="client-orders-table-wrap">
         {% if orders %}
             <div class="table-wrapper">
                 <table>
@@ -57,7 +58,7 @@
                             <th>Создан</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="client-orders-tbody">
                         {% for order in orders %}
                         <tr data-order-id="{{ order.id }}">
                             <td>#{{ order.id }}</td>
@@ -74,6 +75,7 @@
         {% else %}
             <p class="empty-state">Пока нет заказов. Создайте первый заказ.</p>
         {% endif %}
+        </div>
     </section>
 </div>
 {% endblock %}

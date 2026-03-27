@@ -1,14 +1,25 @@
-"""Socket.IO уведомления о заказах (опционально; страницы работают и без realtime)."""
+"""Socket.IO: order_created / order_updated (WebSocket only, без polling)."""
 
-from extensions import socketio
+from extensions import db, socketio
+from models import User
+
+
+def _order_dict(order):
+    data = order.to_dict()
+    user = getattr(order, "user", None)
+    if user is None and order.user_id:
+        user = db.session.get(User, order.user_id)
+    data["client_email"] = user.email if user else None
+    return data
 
 
 def emit_order_created(order, actor_role: str):
     payload = {
         "message": "New client order created",
-        "order": order.to_dict(),
+        "order": _order_dict(order),
         "actor_role": actor_role,
     }
+    socketio.emit("order_created", payload, room=f"user:{order.user_id}")
     socketio.emit("order_created", payload, room="role:franchisee")
     socketio.emit("order_created", payload, room="role:production")
 
@@ -16,7 +27,7 @@ def emit_order_created(order, actor_role: str):
 def emit_order_updated(order, actor_role: str):
     base = {
         "message": "Order updated",
-        "order": order.to_dict(),
+        "order": _order_dict(order),
         "actor_role": actor_role,
     }
     socketio.emit("order_updated", base, room=f"user:{order.user_id}")

@@ -10,9 +10,10 @@
             <h2>Все заказы</h2>
             <p class="muted">Допустимые переходы только по цепочке статусов.</p>
         </div>
-        <span class="badge">{{ orders|length }}</span>
+        <span class="badge" data-franchisee-order-count>{{ orders|length }}</span>
     </div>
 
+    <div id="franchisee-orders-wrap">
     {% if orders %}
         <div class="table-wrapper">
             <table>
@@ -28,7 +29,7 @@
                         <th>Действие</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="franchisee-orders-tbody">
                     {% for order in orders %}
                     {% set allowed = next_statuses_for_franchisee(order.status) %}
                     <tr data-order-id="{{ order.id }}">
@@ -39,7 +40,7 @@
                         <td class="js-order-status">{{ order.status }}</td>
                         <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
                         <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>
+                        <td class="js-franchisee-actions">
                             {% if allowed %}
                             <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
                                 {% for s in allowed %}
@@ -58,5 +59,6 @@
     {% else %}
         <p class="empty-state">Заказов пока нет.</p>
     {% endif %}
+    </div>
 </section>
 {% endblock %}
