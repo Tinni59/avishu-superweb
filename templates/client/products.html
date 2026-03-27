@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Товары | AVISHU{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Client</p>
+        <h2>Каталог товаров</h2>
+        <p>Заглушка: позже здесь будет каталог. <a href="{{ url_for('client.orders') }}">Перейти к заказам</a></p>
+    </div>
+</section>
+
+<section class="card">
+    <p class="muted">Демо-товары: AVISHU Box, AVISHU Kit — оформление через раздел «Мои заказы».</p>
+</section>
+{% endblock %}

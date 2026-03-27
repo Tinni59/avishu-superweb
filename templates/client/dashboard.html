@@ -7,75 +7,17 @@
     <div>
         <p class="eyebrow">Client</p>
         <h2>Клиентский кабинет</h2>
-        <p>Создавайте заказы и отслеживайте их статусы в реальном времени.</p>
+        <p>Каталог, заказы и статусы — обновление страницы по запросу.</p>
     </div>
 </section>
 
 <div class="grid two-columns">
     <section class="card">
-        <h3>Новый заказ</h3>
-        <form method="post" action="{{ url_for('client.create_order') }}" class="stack-form">
-            <label>
-                <span>Название продукта</span>
-                <input id="product_name" name="product_name" type="text" placeholder="Например, AVISHU Box" required>
-            </label>
-
-            <label>
-                <span>Тип заказа</span>
-                <select id="type" name="type" required>
-                    {% for order_type in order_types %}
-                    <option value="{{ order_type }}">{{ order_type }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-
-            <label>
-                <span>Дедлайн</span>
-                <input id="deadline" name="deadline" type="date">
-            </label>
-
-            <button type="submit" class="primary-btn">Создать заказ</button>
-        </form>
-    </section>
-
-    <section class="card">
-        <div class="section-header">
-            <h3>Мои заказы</h3>
-            <span class="badge">{{ orders|length }}</span>
-        </div>
-
-        <div id="live-log" class="live-log"></div>
-
-        {% if orders %}
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Продукт</th>
-                            <th>Тип</th>
-                            <th>Статус</th>
-                            <th>Дедлайн</th>
-                            <th>Создан</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orders-table-body">
-                        {% for order in orders %}
-                        <tr data-order-id="{{ order.id }}">
-                            <td>#{{ order.id }}</td>
-                            <td>{{ order.product_name }}</td>
-                            <td>{{ order.type }}</td>
-                            <td class="status">{{ order.status }}</td>
-                            <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
-                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-state">Пока нет заказов. Создайте первый заказ.</p>
-        {% endif %}
+        <h3>Разделы</h3>
+        <ul class="link-list">
+            <li><a class="nav-link" href="{{ url_for('client.products') }}">Товары (заглушка)</a></li>
+            <li><a class="nav-link" href="{{ url_for('client.orders') }}">Мои заказы</a></li>
+        </ul>
     </section>
 </div>
 {% endblock %}

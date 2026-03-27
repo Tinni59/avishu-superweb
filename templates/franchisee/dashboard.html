@@ -6,48 +6,7 @@
 <section class="panel">
     <p class="eyebrow">Franchisee</p>
     <h2>Кабинет франчайзи</h2>
-    <p class="muted">Здесь отображаются все заказы и их актуальные статусы.</p>
-</section>
-
-<section class="panel">
-    <div class="section-header">
-        <h3>Все заказы</h3>
-        <span class="badge">{{ orders|length }}</span>
-    </div>
-
-    <div id="live-log" class="live-log"></div>
-
-    {% if orders %}
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Клиент</th>
-                        <th>Продукт</th>
-                        <th>Тип</th>
-                        <th>Статус</th>
-                        <th>Дедлайн</th>
-                        <th>Создан</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                    <tr data-order-id="{{ order.id }}">
-                        <td>#{{ order.id }}</td>
-                        <td>{{ order.user.email }}</td>
-                        <td>{{ order.product_name }}</td>
-                        <td>{{ order.type }}</td>
-                        <td class="js-order-status">{{ order.status }}</td>
-                        <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
-                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="empty-state">Заказов пока нет.</p>
-    {% endif %}
+    <p class="muted">Все заказы и смена статусов: <strong>created → accepted → in_production</strong>.</p>
+    <p><a class="nav-link" href="{{ url_for('franchisee.orders') }}">Все заказы</a> · JSON: <code>GET /orders</code></p>
 </section>
 {% endblock %}

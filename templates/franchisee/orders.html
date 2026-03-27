@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Заказы (франчайзи) | AVISHU{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="section-header">
+        <div>
+            <p class="eyebrow">Franchisee</p>
+            <h2>Все заказы</h2>
+            <p class="muted">Допустимые переходы только по цепочке статусов.</p>
+        </div>
+        <span class="badge">{{ orders|length }}</span>
+    </div>
+
+    {% if orders %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Клиент</th>
+                        <th>Продукт</th>
+                        <th>Тип</th>
+                        <th>Статус</th>
+                        <th>Дедлайн</th>
+                        <th>Создан</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    {% set allowed = next_statuses_for_franchisee(order.status) %}
+                    <tr data-order-id="{{ order.id }}">
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user.email }}</td>
+                        <td>{{ order.product_name }}</td>
+                        <td>{{ order.type }}</td>
+                        <td class="js-order-status">{{ order.status }}</td>
+                        <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if allowed %}
+                            <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
+                                {% for s in allowed %}
+                                <button type="submit" name="status" value="{{ s }}" class="small-btn">{{ s }}</button>
+                                {% endfor %}
+                            </form>
+                            {% else %}
+                            <span class="muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">Заказов пока нет.</p>
+    {% endif %}
+</section>
+{% endblock %}
