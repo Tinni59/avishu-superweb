@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 
-from app import db
+from extensions import db
 from models import Order
 from order_events import emit_order_created, emit_order_updated
 from order_status import (

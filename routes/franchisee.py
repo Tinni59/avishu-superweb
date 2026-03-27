@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from app import db
+from extensions import db
 from models import Order
 from order_events import emit_order_updated
 from order_status import is_valid_franchisee_transition, next_statuses_for_franchisee

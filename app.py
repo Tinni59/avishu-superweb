@@ -1,18 +1,14 @@
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, url_for
-from flask_login import LoginManager, current_user
-from flask_socketio import SocketIO, emit, join_room
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import current_user
+from flask_socketio import emit, join_room
+from extensions import db, login_manager, socketio
 
 
 BASE_DIR = Path(__file__).resolve().parent
 INSTANCE_DIR = BASE_DIR / "instance"
 DATABASE_PATH = INSTANCE_DIR / "avishu.db"
-
-db = SQLAlchemy()
-login_manager = LoginManager()
-socketio = SocketIO(async_mode="threading")
 
 
 def create_app(test_config=None):
@@ -92,10 +88,3 @@ def handle_ping(data=None):
             "payload": data or {},
         },
     )
-
-
-app = create_app()
-
-
-if __name__ == "__main__":
-    socketio.run(app, debug=True)

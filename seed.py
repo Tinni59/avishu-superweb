@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 
-from app import app, db
+from app import create_app
+from extensions import db
 from models import User
 
 TEST_USERS = [
@@ -11,6 +12,7 @@ TEST_USERS = [
 
 
 def seed_users():
+    app = create_app()
     with app.app_context():
         db.create_all()
 

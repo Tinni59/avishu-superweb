@@ -2,7 +2,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import db
+from extensions import db
 from models import USER_ROLES, User
 from routes.helpers import redirect_for_role
 

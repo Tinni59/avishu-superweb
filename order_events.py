@@ -1,6 +1,6 @@
 """Socket.IO уведомления о заказах (опционально; страницы работают и без realtime)."""
 
-from app import socketio
+from extensions import socketio
 
 
 def emit_order_created(order, actor_role: str):
