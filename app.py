@@ -15,13 +15,16 @@ login_manager = LoginManager()
 socketio = SocketIO(async_mode="threading")
 
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__, instance_path=str(INSTANCE_DIR), instance_relative_config=True)
     app.config["SECRET_KEY"] = "change-me-for-production"
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DATABASE_PATH}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    if test_config:
+        app.config.update(test_config)
 
-    INSTANCE_DIR.mkdir(exist_ok=True)
+    if not app.config.get("TESTING"):
+        INSTANCE_DIR.mkdir(exist_ok=True)
 
     db.init_app(app)
     login_manager.init_app(app)
@@ -34,6 +37,7 @@ def create_app():
     from routes.client import client_bp
     from routes.franchisee import franchisee_bp
     from routes.production import production_bp
+    from routes.orders_api import orders_api_bp
     from routes.helpers import redirect_for_role
 
     @login_manager.user_loader
@@ -54,6 +58,7 @@ def create_app():
     app.register_blueprint(client_bp)
     app.register_blueprint(franchisee_bp)
     app.register_blueprint(production_bp)
+    app.register_blueprint(orders_api_bp)
 
     with app.app_context():
         db.create_all()

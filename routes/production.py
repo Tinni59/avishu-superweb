@@ -1,10 +1,11 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import login_required
 
-from app import db, socketio
-from models import ORDER_STATUSES, Order
+from app import db
+from models import Order
+from order_events import emit_order_updated
+from order_status import is_valid_production_transition, next_statuses_for_production
 from routes.helpers import role_required
-
 
 production_bp = Blueprint("production", __name__, url_prefix="/production")
 
@@ -13,18 +14,24 @@ production_bp = Blueprint("production", __name__, url_prefix="/production")
 @login_required
 @role_required("production")
 def dashboard():
-    active_orders = (
-        Order.query.filter(Order.status.in_(("created", "accepted", "in_production")))
+    return render_template("production/dashboard.html")
+
+
+@production_bp.route("/orders")
+@login_required
+@role_required("production")
+def orders():
+    visible = (
+        Order.query.filter(Order.status.in_(("accepted", "in_production")))
         .order_by(Order.created_at.desc())
         .all()
     )
-    completed_orders = Order.query.filter_by(status="done").order_by(Order.created_at.desc()).all()
+    done_list = Order.query.filter_by(status="done").order_by(Order.created_at.desc()).all()
     return render_template(
-        "production/dashboard.html",
-        active_orders=active_orders,
-        completed_orders=completed_orders,
-        order_statuses=ORDER_STATUSES,
-        current_user=current_user,
+        "production/orders.html",
+        visible_orders=visible,
+        completed_orders=done_list,
+        next_statuses_for_production=next_statuses_for_production,
     )
 
 
@@ -33,42 +40,21 @@ def dashboard():
 @role_required("production")
 def update_status(order_id):
     order = Order.query.get_or_404(order_id)
-    next_status = request.form.get("status", "").strip()
+    new_status = request.form.get("status", "").strip()
 
-    if next_status not in ORDER_STATUSES:
-        flash("Недопустимый статус.", "error")
-        return redirect(url_for("production.dashboard"))
+    if order.status not in ("accepted", "in_production"):
+        flash("Этот заказ недоступен для производства.", "error")
+        return redirect(url_for("production.orders"))
 
-    order.status = next_status
+    if not is_valid_production_transition(order.status, new_status):
+        flash(
+            f"Переход из «{order.status}» в «{new_status}» недопустим.",
+            "error",
+        )
+        return redirect(url_for("production.orders"))
+
+    order.status = new_status
     db.session.commit()
-
-    socketio.emit(
-        "order_updated",
-        {
-            "message": "Order moved by production",
-            "order": order.to_dict(),
-            "actor_role": current_user.role,
-        },
-        room=f"user:{order.user_id}",
-    )
-    socketio.emit(
-        "order_updated",
-        {
-            "message": "Production updated order status",
-            "order": order.to_dict(),
-            "actor_role": current_user.role,
-        },
-        room="role:franchisee",
-    )
-    socketio.emit(
-        "order_updated",
-        {
-            "message": "Production updated order status",
-            "order": order.to_dict(),
-            "actor_role": current_user.role,
-        },
-        room="role:production",
-    )
-
-    flash("Статус заказа обновлен.", "success")
-    return redirect(url_for("production.dashboard"))
+    emit_order_updated(order, current_user.role)
+    flash("Статус заказа обновлён.", "success")
+    return redirect(url_for("production.orders"))

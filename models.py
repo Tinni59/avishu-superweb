@@ -3,11 +3,10 @@ from datetime import datetime
 from flask_login import UserMixin
 
 from app import db
+from order_status import ORDER_STATUSES, ORDER_TYPES
 
 
 USER_ROLES = ("client", "franchisee", "production")
-ORDER_TYPES = ("in_stock", "preorder")
-ORDER_STATUSES = ("created", "accepted", "in_production", "done")
 
 
 class User(UserMixin, db.Model):
