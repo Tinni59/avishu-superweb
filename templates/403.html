@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Нет доступа | AVISHU{% endblock %}
+
+{% block content %}
+<section class="panel panel-sm">
+    <h2>Доступ запрещен</h2>
+    <p>У вашей учетной записи нет прав для этого раздела.</p>
+    <a class="button secondary" href="{{ url_for('auth.login') }}">К форме входа</a>
+</section>
+{% endblock %}

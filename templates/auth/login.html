@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Вход | AVISHU{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <div>
+        <p class="eyebrow">AVISHU superapp</p>
+        <h2>Вход в систему</h2>
+        <p class="section-text">Авторизуйтесь, чтобы попасть в интерфейс своей роли.</p>
+    </div>
+
+    <form method="post" class="stack-form">
+        <label>
+            <span>Email</span>
+            <input type="email" name="email" placeholder="you@example.com" required>
+        </label>
+
+        <label>
+            <span>Пароль</span>
+            <input type="password" name="password" placeholder="Введите пароль" required>
+        </label>
+
+        <button type="submit" class="primary-btn">Войти</button>
+    </form>
+
+    <p class="footer-note">Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрироваться</a></p>
+</section>
+{% endblock %}
