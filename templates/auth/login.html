@@ -3,27 +3,23 @@
 {% block title %}Вход | AVISHU{% endblock %}
 
 {% block content %}
-<section class="auth-card">
-    <div>
-        <p class="eyebrow">AVISHU superapp</p>
-        <h2>Вход в систему</h2>
-        <p class="section-text">Авторизуйтесь, чтобы попасть в интерфейс своей роли.</p>
-    </div>
+<section class="av-auth">
+    <p class="av-kicker" style="font-size: 0.62rem; letter-spacing: 0.24em; color: #737373; margin-bottom: 1rem;">AVISHU</p>
+    <h2 class="av-h">Вход</h2>
+    <p class="av-muted" style="margin-bottom: 2rem;">Доступ к витрине, башне или цеху — по роли аккаунта</p>
 
     <form method="post" class="stack-form">
-        <label>
+        <div class="av-field">
             <span>Email</span>
-            <input type="email" name="email" placeholder="you@example.com" required>
-        </label>
-
-        <label>
+            <input class="av-input" type="email" name="email" placeholder="" required autocomplete="email">
+        </div>
+        <div class="av-field">
             <span>Пароль</span>
-            <input type="password" name="password" placeholder="Введите пароль" required>
-        </label>
-
-        <button type="submit" class="primary-btn">Войти</button>
+            <input class="av-input" type="password" name="password" placeholder="" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="av-btn av-btn--inverse av-btn--block">Войти</button>
     </form>
 
-    <p class="footer-note">Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрироваться</a></p>
+    <p class="av-muted" style="margin-top: 2rem;"><a href="{{ url_for('auth.register') }}">Регистрация</a></p>
 </section>
 {% endblock %}

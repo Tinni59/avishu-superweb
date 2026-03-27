@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, redirect, render_template, session, url_for
 from flask_login import current_user
 from flask_socketio import emit, join_room
 from extensions import db, login_manager, socketio
@@ -49,6 +49,16 @@ def create_app(test_config=None):
     @app.errorhandler(403)
     def forbidden(_error):
         return render_template("403.html"), 403
+
+    @app.context_processor
+    def cart_count():
+        if not current_user.is_authenticated:
+            return {"cart_count": 0}
+        if getattr(current_user, "role", None) != "client":
+            return {"cart_count": 0}
+        cart = session.get("cart")
+        n = len(cart) if isinstance(cart, list) else 0
+        return {"cart_count": n}
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(client_bp)

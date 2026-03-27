@@ -1,12 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Кабинет франчайзи | AVISHU{% endblock %}
+{% block title %}Башня управления | AVISHU{% endblock %}
 
 {% block content %}
-<section class="panel">
-    <p class="eyebrow">Franchisee</p>
-    <h2>Кабинет франчайзи</h2>
-    <p class="muted">Все заказы и смена статусов: <strong>created → accepted → in_production</strong>.</p>
-    <p><a class="nav-link" href="{{ url_for('franchisee.orders') }}">Все заказы</a> · JSON: <code>GET /orders</code></p>
-</section>
+<div class="av-section-head">
+    <h2>Башня управления</h2>
+    <p class="av-muted">B2B · партнёрская зона</p>
+</div>
+
+<div class="av-metrics">
+    <div class="av-metric">
+        <div class="av-metric__val">{{ revenue_stub }}</div>
+        <div class="av-metric__label">Выручка за сегодня</div>
+        <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.65rem;">Заглушка метрики</p>
+    </div>
+    <div class="av-metric">
+        <div class="av-metric__val">{{ plan_stub }}</div>
+        <div class="av-metric__label">Выполнение плана</div>
+        <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.65rem;">Заглушка KPI</p>
+    </div>
+</div>
+
+<div class="av-section-head">
+    <h2>Воронка заказов</h2>
+    <a class="av-muted" href="{{ url_for('franchisee.orders') }}">Полный список →</a>
+</div>
+
+<div class="av-kanban">
+    <div class="av-kanban__col">
+        <div class="av-kanban__head">Новые</div>
+        <div class="av-kanban__count">{{ order_counts.created }}</div>
+    </div>
+    <div class="av-kanban__col">
+        <div class="av-kanban__head">Принято</div>
+        <div class="av-kanban__count">{{ order_counts.accepted }}</div>
+    </div>
+    <div class="av-kanban__col">
+        <div class="av-kanban__head">В работе</div>
+        <div class="av-kanban__count">{{ order_counts.in_production }}</div>
+    </div>
+    <div class="av-kanban__col">
+        <div class="av-kanban__head">Готово</div>
+        <div class="av-kanban__count">{{ order_counts.done }}</div>
+    </div>
+</div>
+
+<p class="av-muted">Новые заказы и смена статусов — в реальном времени на странице <a href="{{ url_for('franchisee.orders') }}">заказов</a>.</p>
 {% endblock %}

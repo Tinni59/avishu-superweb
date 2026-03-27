@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Корзина | AVISHU{% endblock %}
+
+{% block content %}
+<div class="av-section-head">
+    <h2>Корзина</h2>
+    <a class="av-muted" href="{{ url_for('client.dashboard') }}">← Витрина</a>
+</div>
+
+{% if cart %}
+    <div class="av-table-wrap" style="margin-bottom: 2rem;">
+        <table class="av-table">
+            <thead>
+                <tr>
+                    <th>Изделие</th>
+                    <th>Тип</th>
+                    <th>Дедлайн</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in cart %}
+                <tr>
+                    <td>{{ line.product_name }}</td>
+                    <td>{{ line.type }}</td>
+                    <td>{% if line.deadline %}{{ line.deadline[:10] }}{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form method="post" action="{{ url_for('client.checkout_cart') }}">
+        <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block" style="max-width: 420px;">Оформить заказ</button>
+    </form>
+{% else %}
+    <p class="av-muted">Корзина пуста.</p>
+    <a class="av-btn av-btn--lg" href="{{ url_for('client.dashboard') }}">На витрину</a>
+{% endif %}
+{% endblock %}

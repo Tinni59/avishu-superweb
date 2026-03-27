@@ -60,12 +60,12 @@
     function franchiseeActionCell(orderId, status) {
         const next = FRANCHISEE_NEXT[status];
         if (!next || !next.length) {
-            return '<span class="muted">—</span>';
+            return '<span class="av-muted">—</span>';
         }
         const buttons = next
             .map(
                 (s) =>
-                    `<button type="submit" name="status" value="${s}" class="small-btn">${s}</button>`
+                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--sm">${s}</button>`
             )
             .join('');
         return `<form method="post" action="/franchisee/orders/${orderId}/status" class="inline-form">${buttons}</form>`;
@@ -74,15 +74,28 @@
     function productionActionCell(orderId, status) {
         const next = PRODUCTION_NEXT[status];
         if (!next || !next.length) {
-            return '<span class="muted">—</span>';
+            return '<span class="av-muted">—</span>';
         }
         const buttons = next
             .map(
                 (s) =>
-                    `<button type="submit" name="status" value="${s}" class="small-btn">${s}</button>`
+                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--xl av-btn--inverse" style="background:#fff;color:#000;border-color:#fff;">Завершить: ${s}</button>`
             )
             .join('');
-        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form">${buttons}</form>`;
+        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form" style="flex-direction:column;width:100%;">${buttons}</form>`;
+    }
+
+    function productionCardHtml(order) {
+        return `
+            <div class="av-queue__card" data-order-id="${order.id}" style="background:#000;color:#fff;border:1px solid #333;">
+                <div>
+                    <p class="av-queue__id" style="color:#737373;">#${order.id}</p>
+                    <p class="av-queue__title" style="color:#fff;">${escapeHtml(order.product_name)}</p>
+                    <p class="av-muted" style="color:#a3a3a3;font-size:0.72rem;letter-spacing:0.1em;">${escapeHtml(order.type)} · срок ${fmtDate(order.deadline)}</p>
+                    <p class="av-queue__id" style="margin-top:0.5rem;">Статус: <span class="js-order-status">${escapeHtml(order.status)}</span></p>
+                </div>
+                <div class="av-queue__actions js-production-actions">${productionActionCell(order.id, order.status)}</div>
+            </div>`;
     }
 
     function ensureClientTable() {
@@ -93,12 +106,12 @@
         const empty = wrap.querySelector('.empty-state');
         if (empty) empty.remove();
         wrap.innerHTML = `
-            <div class="table-wrapper">
-                <table>
+            <div class="av-table-wrap">
+                <table class="av-table">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Продукт</th>
+                            <th>Изделие</th>
                             <th>Тип</th>
                             <th>Статус</th>
                             <th>Дедлайн</th>
@@ -148,6 +161,24 @@
         return div.innerHTML;
     }
 
+    function updateClientTrack(order) {
+        const track = document.getElementById('client-order-track');
+        if (!track || parseInt(track.dataset.orderId, 10) !== order.id) return;
+        const steps = track.querySelectorAll('.av-step');
+        if (steps.length < 3) return;
+        steps[0].classList.add('av-step--on');
+        if (['accepted', 'in_production', 'done'].includes(order.status)) {
+            steps[1].classList.add('av-step--on');
+        } else {
+            steps[1].classList.remove('av-step--on');
+        }
+        if (order.status === 'done') {
+            steps[2].classList.add('av-step--on');
+        } else {
+            steps[2].classList.remove('av-step--on');
+        }
+    }
+
     function ensureFranchiseeTable() {
         const wrap = document.getElementById('franchisee-orders-wrap');
         if (!wrap) return null;
@@ -156,13 +187,13 @@
         const empty = wrap.querySelector('.empty-state');
         if (empty) empty.remove();
         wrap.innerHTML = `
-            <div class="table-wrapper">
-                <table>
+            <div class="av-table-wrap">
+                <table class="av-table">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Клиент</th>
-                            <th>Продукт</th>
+                            <th>Изделие</th>
                             <th>Тип</th>
                             <th>Статус</th>
                             <th>Дедлайн</th>
@@ -206,11 +237,11 @@
     }
 
     function removeProductionActiveRow(orderId) {
-        const row = document.querySelector(`#production-active-tbody tr[data-order-id="${orderId}"]`);
-        if (row) row.remove();
+        const card = document.querySelector(`#production-active-wrap .av-queue [data-order-id="${orderId}"]`);
+        if (card) card.remove();
         const badge = document.querySelector('[data-production-active-count]');
         if (badge) {
-            const rest = document.querySelectorAll('#production-active-tbody tr[data-order-id]').length;
+            const rest = document.querySelectorAll('#production-active-wrap .av-queue [data-order-id]').length;
             badge.textContent = String(rest);
         }
     }
@@ -224,14 +255,13 @@
         }
         const email = order.client_email || '—';
         const li = document.createElement('li');
-        li.className = 'list-card';
         li.dataset.orderId = String(order.id);
         li.innerHTML = `
             <div>
-                <strong>#${order.id} — ${escapeHtml(order.product_name)}</strong>
-                <p class="muted">Клиент: ${escapeHtml(email)}</p>
+                <strong style="letter-spacing:0.08em;text-transform:uppercase;font-size:0.85rem;">#${order.id} — ${escapeHtml(order.product_name)}</strong>
+                <p class="av-muted" style="margin:0.35rem 0 0;">${escapeHtml(email)}</p>
             </div>
-            <span class="badge">done</span>`;
+            <span class="av-badge">done</span>`;
         list.insertBefore(li, list.firstChild);
         const badge = document.querySelector('[data-production-done-count]');
         if (badge) {
@@ -240,74 +270,55 @@
         }
     }
 
-    function ensureProductionActiveTable() {
+    function ensureProductionQueue() {
         const wrap = document.getElementById('production-active-wrap');
         if (!wrap) return null;
-        let tbody = document.getElementById('production-active-tbody');
-        if (tbody) return tbody;
-        const empty = wrap.querySelector('.empty-state');
+        let queue = wrap.querySelector('.av-queue');
+        if (queue) return queue;
+        const empty = wrap.querySelector('.empty-state, .av-muted');
         if (empty) empty.remove();
-        wrap.innerHTML = `
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Продукт</th>
-                            <th>Тип</th>
-                            <th>Статус</th>
-                            <th>Срок</th>
-                            <th>Действие</th>
-                        </tr>
-                    </thead>
-                    <tbody id="production-active-tbody"></tbody>
-                </table>
-            </div>`;
+        wrap.innerHTML = '<div class="av-queue" id="production-active-queue"></div>';
         const badge = document.querySelector('[data-production-active-count]');
         if (badge) badge.textContent = '0';
-        return document.getElementById('production-active-tbody');
+        return document.getElementById('production-active-queue');
     }
 
     function upsertProductionActiveRow(order) {
         if (order.status !== 'accepted' && order.status !== 'in_production') return;
 
-        let tbody = document.getElementById('production-active-tbody');
-        if (!tbody) tbody = ensureProductionActiveTable();
-        if (!tbody) return;
+        let queue = document.getElementById('production-active-queue');
+        if (!queue) queue = ensureProductionQueue();
+        if (!queue) return;
 
-        let row = tbody.querySelector(`tr[data-order-id="${order.id}"]`);
-        if (!row) {
-            row = document.createElement('tr');
-            row.dataset.orderId = String(order.id);
-            tbody.insertBefore(row, tbody.firstChild);
+        let card = queue.querySelector(`[data-order-id="${order.id}"]`);
+        if (!card) {
+            const div = document.createElement('div');
+            div.innerHTML = productionCardHtml(order).trim();
+            queue.insertBefore(div.firstElementChild, queue.firstChild);
             const badge = document.querySelector('[data-production-active-count]');
             if (badge) {
                 const n = parseInt(badge.textContent, 10) || 0;
                 badge.textContent = String(n + 1);
             }
+            return;
         }
-        row.innerHTML = `
-            <td>#${order.id}</td>
-            <td>${escapeHtml(order.product_name)}</td>
-            <td>${escapeHtml(order.type)}</td>
-            <td class="js-order-status">${escapeHtml(order.status)}</td>
-            <td>${fmtDate(order.deadline)}</td>
-            <td class="js-production-actions">${productionActionCell(order.id, order.status)}</td>`;
+        card.outerHTML = productionCardHtml(order);
     }
 
     function updateOrderRowStatus(order) {
         const row = document.querySelector(`tr[data-order-id="${order.id}"]`);
-        if (!row) return;
-        const cell = row.querySelector('.status, .js-order-status');
-        if (cell) cell.textContent = order.status;
-
-        const fa = row.querySelector('.js-franchisee-actions');
-        if (fa) {
-            fa.innerHTML = franchiseeActionCell(order.id, order.status);
+        if (row) {
+            const cell = row.querySelector('.status, .js-order-status');
+            if (cell) cell.textContent = order.status;
+            const fa = row.querySelector('.js-franchisee-actions');
+            if (fa) fa.innerHTML = franchiseeActionCell(order.id, order.status);
         }
-        const pa = row.querySelector('.js-production-actions');
-        if (pa) {
-            pa.innerHTML = productionActionCell(order.id, order.status);
+        const card = document.querySelector(`#production-active-wrap .av-queue [data-order-id="${order.id}"]`);
+        if (card) {
+            const st = card.querySelector('.js-order-status');
+            if (st) st.textContent = order.status;
+            const pa = card.querySelector('.js-production-actions');
+            if (pa) pa.innerHTML = productionActionCell(order.id, order.status);
         }
     }
 
@@ -350,6 +361,7 @@
 
         if (role === 'client' && userId === order.user_id) {
             upsertClientRow(order);
+            updateClientTrack(order);
             showAlert(`Заказ #${order.id}: ${order.status}`);
             return;
         }

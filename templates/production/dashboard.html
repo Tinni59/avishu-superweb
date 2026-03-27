@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Производство | AVISHU{% endblock %}
+{% block body_class %}av-theme-dark{% endblock %}
+
+{% block title %}Цех | AVISHU{% endblock %}
 
 {% block content %}
-<section class="grid two-columns">
-    <section class="panel">
-        <p class="eyebrow">Production</p>
-        <h2>Производство</h2>
-        <p class="muted">Видны заказы со статусом <strong>accepted</strong> или <strong>in_production</strong>. Завершение: только переход в <strong>done</strong>.</p>
-        <p><a class="nav-link" href="{{ url_for('production.orders') }}">Заказы производства</a></p>
-    </section>
+<section class="av-prod-hero">
+    <p class="av-kicker" style="color: #a3a3a3; font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 1rem;">Планшет мастера</p>
+    <h1>ПРОИЗВОДСТВО</h1>
+    <p>Очередь задач на пошив. Крупные кнопки — минимум текста. Статус пишется в базу при нажатии.</p>
+    <div style="margin-top: 2rem;">
+        <a class="av-btn av-btn--inverse" href="{{ url_for('production.orders') }}">Открыть очередь</a>
+    </div>
 </section>
 {% endblock %}

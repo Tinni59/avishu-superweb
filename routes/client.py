@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 
 from extensions import db
@@ -10,6 +10,42 @@ from order_status import ORDER_TYPES, validate_new_order
 from routes.helpers import role_required
 
 client_bp = Blueprint("client", __name__, url_prefix="/client")
+
+# Витрина: демо-каталог (без отдельной БД товаров)
+CATALOG = [
+    {
+        "id": "av-fw25-coat",
+        "name": "Atelier Wool Coat",
+        "line": "FW25",
+        "type": "in_stock",
+        "price": "48 000 ₽",
+        "detail": "Пальто из итальянской шерсти. Ограниченная партия.",
+    },
+    {
+        "id": "av-capsule-silk",
+        "name": "Silk Capsule Set",
+        "line": "Capsule",
+        "type": "preorder",
+        "price": "от 32 000 ₽",
+        "detail": "Шёлковый комплект на заказ. Срок — по календарю готовности.",
+    },
+    {
+        "id": "av-leather-tote",
+        "name": "Brutal Tote",
+        "line": "Objects",
+        "type": "in_stock",
+        "price": "22 000 ₽",
+        "detail": "Кожа растительного дубления. Ручная работа.",
+    },
+    {
+        "id": "av-mono-dress",
+        "name": "Mono Column Dress",
+        "line": "Runway",
+        "type": "preorder",
+        "price": "от 41 000 ₽",
+        "detail": "Предзаказ коллекции. Укажите желаемую дату готовности.",
+    },
+]
 
 
 def _parse_deadline_form(raw: str):
@@ -22,18 +58,40 @@ def _parse_deadline_form(raw: str):
         return None
 
 
+def _session_cart():
+    cart = session.get("cart")
+    if not isinstance(cart, list):
+        cart = []
+        session["cart"] = cart
+    return cart
+
+
+def _create_order_for_user(product_name: str, order_type: str, deadline):
+    order = Order(
+        user_id=current_user.id,
+        product_name=product_name,
+        type=order_type,
+        status="created",
+        deadline=deadline,
+    )
+    db.session.add(order)
+    db.session.commit()
+    emit_order_created(order, current_user.role)
+    return order
+
+
 @client_bp.route("/")
 @login_required
 @role_required("client")
 def dashboard():
-    return render_template("client/dashboard.html")
+    return render_template("client/dashboard.html", catalog=CATALOG)
 
 
 @client_bp.route("/products")
 @login_required
 @role_required("client")
 def products():
-    return render_template("client/products.html")
+    return redirect(url_for("client.dashboard"))
 
 
 @client_bp.route("/orders")
@@ -45,11 +103,76 @@ def orders():
         .order_by(Order.created_at.desc())
         .all()
     )
+    loyalty_pct = min(100, len(order_list) * 12 + 8)
     return render_template(
         "client/orders.html",
         orders=order_list,
         order_types=ORDER_TYPES,
+        loyalty_pct=loyalty_pct,
     )
+
+
+@client_bp.route("/cart", methods=["GET", "POST"])
+@login_required
+@role_required("client")
+def cart():
+    if request.method == "POST":
+        product_name = request.form.get("product_name", "").strip()
+        order_type = request.form.get("type", "").strip()
+        deadline = _parse_deadline_form(request.form.get("deadline", ""))
+
+        ok, err = validate_new_order(order_type, deadline)
+        if not ok:
+            flash(err, "error")
+            return redirect(url_for("client.dashboard"))
+
+        if not product_name:
+            flash("Товар не указан.", "error")
+            return redirect(url_for("client.dashboard"))
+
+        cart = _session_cart()
+        cart.append(
+            {
+                "product_name": product_name,
+                "type": order_type,
+                "deadline": deadline.isoformat() if deadline else None,
+            }
+        )
+        session["cart"] = cart
+        session.modified = True
+        flash("Добавлено в корзину.", "success")
+        return redirect(url_for("client.dashboard"))
+
+    return render_template("client/cart.html", cart=_session_cart())
+
+
+@client_bp.route("/cart/checkout", methods=["POST"])
+@login_required
+@role_required("client")
+def checkout_cart():
+    cart = _session_cart()
+    if not cart:
+        flash("Корзина пуста.", "error")
+        return redirect(url_for("client.cart"))
+
+    for item in cart:
+        order_type = item.get("type", "").strip()
+        deadline = None
+        if item.get("deadline"):
+            try:
+                deadline = datetime.fromisoformat(item["deadline"])
+            except (ValueError, TypeError):
+                deadline = None
+        ok, err = validate_new_order(order_type, deadline)
+        if not ok:
+            flash(err, "error")
+            return redirect(url_for("client.cart"))
+        _create_order_for_user(item["product_name"], order_type, deadline)
+
+    session["cart"] = []
+    session.modified = True
+    flash("Заказ оформлен.", "success")
+    return redirect(url_for("client.orders"))
 
 
 @client_bp.route("/orders", methods=["POST"])
@@ -63,23 +186,14 @@ def create_order():
     ok, err = validate_new_order(order_type, deadline)
     if not ok:
         flash(err, "error")
-        return redirect(url_for("client.orders"))
+        return redirect(request.referrer or url_for("client.dashboard"))
 
     if not product_name:
         flash("Укажите название продукта.", "error")
-        return redirect(url_for("client.orders"))
+        return redirect(request.referrer or url_for("client.dashboard"))
 
-    order = Order(
-        user_id=current_user.id,
-        product_name=product_name,
-        type=order_type,
-        status="created",
-        deadline=deadline,
-    )
-    db.session.add(order)
-    db.session.commit()
-
-    emit_order_created(order, current_user.role)
+    _create_order_for_user(product_name, order_type, deadline)
 
     flash("Заказ создан.", "success")
-    return redirect(url_for("client.orders"))
+    next_url = request.form.get("next") or url_for("client.orders")
+    return redirect(next_url)

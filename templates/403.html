@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Нет доступа | AVISHU{% endblock %}
+{% block title %}Доступ | AVISHU{% endblock %}
 
 {% block content %}
-<section class="panel panel-sm">
-    <h2>Доступ запрещен</h2>
-    <p>У вашей учетной записи нет прав для этого раздела.</p>
-    <a class="button secondary" href="{{ url_for('auth.login') }}">К форме входа</a>
+<section class="av-panel">
+    <h2 class="av-h">Нет доступа</h2>
+    <p class="av-muted" style="margin-bottom: 2rem;">Этот раздел недоступен для вашей роли</p>
+    <a class="av-btn av-btn--inverse" href="{{ url_for('auth.login') }}">Ко входу</a>
 </section>
 {% endblock %}

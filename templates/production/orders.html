@@ -1,87 +1,73 @@
 {% extends "base.html" %}
 
-{% block title %}Заказы (производство) | AVISHU{% endblock %}
+{% block body_class %}av-theme-dark{% endblock %}
+
+{% block title %}Очередь | AVISHU{% endblock %}
 
 {% block content %}
-<section class="grid two-columns">
-    <section class="panel">
-        <div class="section-header">
-            <div>
-                <p class="eyebrow">Production</p>
-                <h2>В работе</h2>
-                <p class="muted">Только accepted и in_production → done.</p>
-            </div>
-            <span class="badge" data-production-active-count>{{ visible_orders|length }}</span>
-        </div>
-
-        <div id="production-active-wrap">
-        {% if visible_orders %}
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Продукт</th>
-                            <th>Тип</th>
-                            <th>Статус</th>
-                            <th>Срок</th>
-                            <th>Действие</th>
-                        </tr>
-                    </thead>
-                    <tbody id="production-active-tbody">
-                        {% for order in visible_orders %}
-                        {% set allowed = next_statuses_for_production(order.status) %}
-                        <tr data-order-id="{{ order.id }}">
-                            <td>#{{ order.id }}</td>
-                            <td>{{ order.product_name }}</td>
-                            <td>{{ order.type }}</td>
-                            <td class="js-order-status">{{ order.status }}</td>
-                            <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
-                            <td class="js-production-actions">
-                                {% if allowed %}
-                                <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form">
-                                    {% for s in allowed %}
-                                    <button type="submit" name="status" value="{{ s }}" class="small-btn">{{ s }}</button>
-                                    {% endfor %}
-                                </form>
-                                {% else %}
-                                <span class="muted">—</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="empty-state">Нет заказов в работе (accepted / in_production).</p>
-        {% endif %}
-        </div>
-    </section>
-
-    <section class="panel">
-        <div class="section-header">
-            <h3>Завершённые</h3>
-            <span class="badge" data-production-done-count>{{ completed_orders|length }}</span>
-        </div>
-
-        {% if completed_orders %}
-            <ul class="card-list" id="production-done-list">
-                {% for order in completed_orders %}
-                <li class="list-card" data-order-id="{{ order.id }}">
-                    <div>
-                        <strong>#{{ order.id }} — {{ order.product_name }}</strong>
-                        <p class="muted">Клиент: {{ order.user.email }}</p>
-                    </div>
-                    <span class="badge">done</span>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <ul class="card-list" id="production-done-list">
-                <li class="empty-state" style="list-style: none; padding: 0;">Завершённых заказов пока нет.</li>
-            </ul>
-        {% endif %}
-    </section>
+<section class="av-prod-hero" style="margin-bottom: 2rem;">
+    <h1>ОЧЕРЕДЬ</h1>
+    <p>Только accepted и in_production. Завершение — done.</p>
 </section>
+
+<div class="av-section-head" style="border-color: rgba(255,255,255,0.2);">
+    <h2 style="color: #fff;">В работе</h2>
+    <span class="av-badge" style="border-color: #fff; color: #fff;" data-production-active-count>{{ visible_orders|length }}</span>
+</div>
+
+<div id="production-active-wrap">
+{% if visible_orders %}
+    <div class="av-queue" id="production-active-queue">
+        {% for order in visible_orders %}
+        {% set allowed = next_statuses_for_production(order.status) %}
+        <div class="av-queue__card" data-order-id="{{ order.id }}" style="background: #000; color: #fff; border: 1px solid #333;">
+            <div>
+                <p class="av-queue__id" style="color: #737373;">#{{ order.id }}</p>
+                <p class="av-queue__title" style="color: #fff;">{{ order.product_name }}</p>
+                <p class="av-muted" style="color: #a3a3a3; font-size: 0.72rem; letter-spacing: 0.1em;">{{ order.type }} · срок {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
+                <p class="av-queue__id" style="margin-top: 0.5rem;">Статус: <span class="js-order-status">{{ order.status }}</span></p>
+            </div>
+            <div class="av-queue__actions js-production-actions">
+                {% if allowed %}
+                <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form" style="flex-direction: column; width: 100%;">
+                    {% for s in allowed %}
+                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--xl av-btn--inverse" style="background: #fff; color: #000; border-color: #fff;">Завершить: {{ s }}</button>
+                    {% endfor %}
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="av-muted" style="color: #737373;">Нет задач в очереди.</p>
+{% endif %}
+</div>
+
+<div class="av-spacer"></div>
+
+<div class="av-section-head">
+    <h2>Завершённые</h2>
+    <span class="av-badge" data-production-done-count>{{ completed_orders|length }}</span>
+</div>
+
+{% if completed_orders %}
+    <ul class="av-done-list" id="production-done-list">
+        {% for order in completed_orders %}
+        <li data-order-id="{{ order.id }}">
+            <div>
+                <strong style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.85rem;">#{{ order.id }} — {{ order.product_name }}</strong>
+                <p class="av-muted" style="margin: 0.35rem 0 0;">{{ order.user.email }}</p>
+            </div>
+            <span class="av-badge">done</span>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <ul class="av-done-list" id="production-done-list">
+        <li class="empty-state av-muted" style="list-style: none; border: none; padding: 1rem 0;">Нет завершённых</li>
+    </ul>
+{% endif %}
+
+<p style="margin-top: 2rem;"><a class="av-muted" href="{{ url_for('production.dashboard') }}">← Цех</a></p>
 {% endblock %}

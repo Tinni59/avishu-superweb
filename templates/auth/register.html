@@ -3,35 +3,30 @@
 {% block title %}Регистрация | AVISHU{% endblock %}
 
 {% block content %}
-<section class="auth-card">
-    <div>
-        <p class="eyebrow">Новый пользователь</p>
-        <h2>Создать аккаунт</h2>
-        <p class="section-text">Роль определяет, в какой кабинет пользователь попадет после входа.</p>
-    </div>
+<section class="av-auth">
+    <p class="av-kicker" style="font-size: 0.62rem; letter-spacing: 0.24em; color: #737373; margin-bottom: 1rem;">Новый аккаунт</p>
+    <h2 class="av-h">Регистрация</h2>
+    <p class="av-muted" style="margin-bottom: 2rem;">Роль задаёт интерфейс после входа</p>
 
     <form method="post" class="stack-form">
-        <label>
+        <div class="av-field">
             <span>Email</span>
-            <input type="email" name="email" placeholder="name@avishu.app" required>
-        </label>
-
-        <label>
+            <input class="av-input" type="email" name="email" required autocomplete="email">
+        </div>
+        <div class="av-field">
             <span>Пароль</span>
-            <input type="password" name="password" placeholder="Минимум 6 символов" required>
-        </label>
-
-        <label>
+            <input class="av-input" type="password" name="password" required autocomplete="new-password">
+        </div>
+        <div class="av-field">
             <span>Роль</span>
-            <select name="role" required>
-                <option value="">Выберите роль</option>
+            <select class="av-select" name="role" required>
+                <option value="">—</option>
                 {% for role in roles %}
                 <option value="{{ role }}">{{ role }}</option>
                 {% endfor %}
             </select>
-        </label>
-
-        <button type="submit" class="primary-btn">Зарегистрироваться</button>
+        </div>
+        <button type="submit" class="av-btn av-btn--inverse av-btn--block">Создать</button>
     </form>
 </section>
 {% endblock %}

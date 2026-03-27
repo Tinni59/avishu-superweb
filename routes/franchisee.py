@@ -14,7 +14,17 @@ franchisee_bp = Blueprint("franchisee", __name__, url_prefix="/franchisee")
 @login_required
 @role_required("franchisee")
 def dashboard():
-    return render_template("franchisee/dashboard.html")
+    orders_all = Order.query.all()
+    counts = {"created": 0, "accepted": 0, "in_production": 0, "done": 0}
+    for o in orders_all:
+        if o.status in counts:
+            counts[o.status] += 1
+    return render_template(
+        "franchisee/dashboard.html",
+        order_counts=counts,
+        revenue_stub="—",
+        plan_stub="72%",
+    )
 
 
 @franchisee_bp.route("/orders")

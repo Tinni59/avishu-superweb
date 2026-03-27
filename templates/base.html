@@ -3,42 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AVISHU MVP{% endblock %}</title>
+    <title>{% block title %}AVISHU{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body
+    class="{% block body_class %}{% endblock %}"
     data-user-role="{{ current_user.role if current_user.is_authenticated else '' }}"
     data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}"
 >
-    <header class="app-header">
-        <div>
-            <p class="eyebrow">AVISHU</p>
-            <h1 class="brand">Superapp MVP</h1>
-            <p class="subtitle">Role-based Flask application with realtime updates</p>
+    <header class="av-header">
+        <div class="av-shell av-header__inner">
+            <a class="av-logo" href="{% if current_user.is_authenticated %}{% if current_user.role == 'client' %}{{ url_for('client.dashboard') }}{% elif current_user.role == 'franchisee' %}{{ url_for('franchisee.dashboard') }}{% elif current_user.role == 'production' %}{{ url_for('production.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}{% else %}{{ url_for('auth.login') }}{% endif %}">AVISHU</a>
+            <nav class="av-nav">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'client' %}
+                        <a href="{{ url_for('client.dashboard') }}">Витрина</a>
+                        <a href="{{ url_for('client.cart') }}">Корзина{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+                        <a href="{{ url_for('client.orders') }}">Заказы</a>
+                    {% elif current_user.role == 'franchisee' %}
+                        <a href="{{ url_for('franchisee.dashboard') }}">Башня</a>
+                        <a href="{{ url_for('franchisee.orders') }}">Заказы</a>
+                    {% elif current_user.role == 'production' %}
+                        <a href="{{ url_for('production.dashboard') }}">Цех</a>
+                        <a href="{{ url_for('production.orders') }}">Очередь</a>
+                    {% endif %}
+                    <span class="av-user">{{ current_user.email }}</span>
+                    <a href="{{ url_for('auth.logout') }}">Выход</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Вход</a>
+                    <a href="{{ url_for('auth.register') }}">Регистрация</a>
+                {% endif %}
+            </nav>
         </div>
-        <nav class="main-nav">
-            {% if current_user.is_authenticated %}
-                <span class="user-chip">{{ current_user.email }} / {{ current_user.role }}</span>
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">Выйти</a>
-            {% else %}
-                <a class="nav-link" href="{{ url_for('auth.login') }}">Войти</a>
-                <a class="nav-link" href="{{ url_for('auth.register') }}">Регистрация</a>
-            {% endif %}
-        </nav>
     </header>
 
-    <main class="page-shell">
+    <main class="av-main av-shell">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <section class="flash-stack">
+                <div class="flash-stack">
                     {% for category, message in messages %}
                         <div class="flash flash-{{ category }}">{{ message }}</div>
                     {% endfor %}
-                </section>
+                </div>
             {% endif %}
         {% endwith %}
 
-        <section id="realtime-alert" class="realtime-alert hidden"></section>
+        <div id="realtime-alert" class="hidden" aria-live="polite"></div>
 
         {% block content %}{% endblock %}
     </main>

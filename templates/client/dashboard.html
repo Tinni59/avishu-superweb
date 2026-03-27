@@ -1,23 +1,73 @@
 {% extends "base.html" %}
 
-{% block title %}Кабинет клиента | AVISHU{% endblock %}
+{% block title %}Витрина | AVISHU{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div>
-        <p class="eyebrow">Client</p>
-        <h2>Клиентский кабинет</h2>
-        <p>Каталог, заказы и статусы — обновление страницы по запросу.</p>
+<section class="av-hero">
+    <p class="av-hero__kicker">Коллекция / сезон</p>
+    <h1 class="av-hero__title">ОСЕНЬ — ЗИМА 25</h1>
+    <p class="av-hero__lead">Минимализм, плотные ткани, линия силуэта. Ограниченные партии и предзаказ по календарю.</p>
+    <a class="av-btn av-btn--inverse" href="#catalog">Смотреть витрину</a>
+</section>
+
+<section id="catalog">
+    <div class="av-section-head">
+        <h2>Каталог</h2>
+        <p class="av-muted">Выберите изделие — карточка откроется в модальном окне</p>
+    </div>
+
+    <div class="av-catalog">
+        {% for item in catalog %}
+        <article class="av-product" data-product-id="{{ item.id }}">
+            <p class="av-product__line">{{ item.line }}</p>
+            <h3 class="av-product__name">{{ item.name }}</h3>
+            <p class="av-product__meta">{{ item.price }} · {% if item.type == 'in_stock' %}в наличии{% else %}предзаказ{% endif %}</p>
+            <button type="button" class="av-btn av-btn--ghost av-product__open" data-open-modal>Подробнее</button>
+        </article>
+        {% endfor %}
     </div>
 </section>
 
-<div class="grid two-columns">
-    <section class="card">
-        <h3>Разделы</h3>
-        <ul class="link-list">
-            <li><a class="nav-link" href="{{ url_for('client.products') }}">Товары (заглушка)</a></li>
-            <li><a class="nav-link" href="{{ url_for('client.orders') }}">Мои заказы</a></li>
-        </ul>
-    </section>
+<div id="product-modal" class="av-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="av-modal__backdrop" data-close-modal></div>
+    <div class="av-modal__panel">
+        <button type="button" class="av-modal__close" data-close-modal aria-label="Закрыть">×</button>
+        <h2 id="modal-title" class="av-modal__title av-h"></h2>
+        <p class="av-modal__price" id="modal-price"></p>
+        <p class="av-modal__detail" id="modal-detail"></p>
+
+        <div id="modal-preorder-fields" class="hidden">
+            <div class="av-field">
+                <span>Дата готовности</span>
+                <input class="av-input" type="date" id="modal-deadline" name="deadline" form="modal-preorder-form">
+            </div>
+        </div>
+
+        <div id="modal-instock-actions" class="av-form-actions hidden">
+            <form method="post" action="{{ url_for('client.cart') }}" id="form-add-cart">
+                <input type="hidden" name="product_name" id="cart-product-name">
+                <input type="hidden" name="type" value="in_stock">
+                <button type="submit" class="av-btn av-btn--lg av-btn--block">Добавить в корзину</button>
+            </form>
+            <form method="post" action="{{ url_for('client.create_order') }}">
+                <input type="hidden" name="product_name" id="buy-product-name">
+                <input type="hidden" name="type" value="in_stock">
+                <input type="hidden" name="next" value="{{ url_for('client.orders') }}">
+                <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block">Купить</button>
+            </form>
+        </div>
+
+        <div id="modal-preorder-actions" class="av-form-actions hidden">
+            <form method="post" action="{{ url_for('client.create_order') }}" id="modal-preorder-form">
+                <input type="hidden" name="product_name" id="preorder-product-name">
+                <input type="hidden" name="type" value="preorder">
+                <input type="hidden" name="next" value="{{ url_for('client.orders') }}">
+                <button type="submit" class="av-btn av-btn--xl av-btn--inverse av-btn--block">Оформить предзаказ</button>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script type="application/json" id="catalog-json">{{ catalog | tojson }}</script>
+<script src="{{ url_for('static', filename='js/client.js') }}"></script>
 {% endblock %}
