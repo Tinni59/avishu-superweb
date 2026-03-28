@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
@@ -10,20 +12,37 @@ from routes.helpers import role_required
 franchisee_bp = Blueprint("franchisee", __name__, url_prefix="/franchisee")
 
 
+def _period_start(period: str) -> datetime:
+    now = datetime.utcnow()
+    if period == "today":
+        return now.replace(hour=0, minute=0, second=0, microsecond=0)
+    if period == "month":
+        return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    # week (default)
+    return now - timedelta(days=7)
+
+
 @franchisee_bp.route("/")
 @login_required
 @role_required("franchisee")
 def dashboard():
-    orders_all = Order.query.all()
+    period = request.args.get("period", "week")
+    if period not in ("today", "week", "month"):
+        period = "week"
+
+    start = _period_start(period)
+    orders_in_period = Order.query.filter(Order.created_at >= start).all()
     counts = {"created": 0, "accepted": 0, "in_production": 0, "done": 0}
-    for o in orders_all:
+    for o in orders_in_period:
         if o.status in counts:
             counts[o.status] += 1
+
     return render_template(
         "franchisee/dashboard.html",
         order_counts=counts,
         revenue_stub="—",
         plan_stub="72%",
+        stats_period=period,
     )
 
 

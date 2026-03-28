@@ -21,10 +21,15 @@
     </div>
 </div>
 
-<div class="av-section-head">
+<div class="av-section-head av-section-head--filter">
     <h2>Воронка заказов</h2>
-    <a class="av-muted" href="{{ url_for('franchisee.orders') }}">Полный список →</a>
+    <div class="av-filter-tabs" role="tablist" aria-label="Период статистики">
+        <a class="av-filter-tab {% if stats_period == 'today' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='today') }}">Сегодня</a>
+        <a class="av-filter-tab {% if stats_period == 'week' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='week') }}">Неделя</a>
+        <a class="av-filter-tab {% if stats_period == 'month' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='month') }}">Месяц</a>
+    </div>
 </div>
+<p class="av-muted" style="margin: -1.5rem 0 2rem; font-size: 0.72rem;">Заказы по дате создания в выбранном периоде</p>
 
 <div class="av-kanban">
     <div class="av-kanban__col">

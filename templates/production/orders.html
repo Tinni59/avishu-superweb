@@ -3,33 +3,33 @@
 {% block title %}Очередь | AVISHU{% endblock %}
 
 {% block content %}
-<section class="av-prod-hero" style="margin-bottom: 2rem;">
+<section class="av-prod-hero av-prod-hero--queue" style="margin-bottom: 2rem;">
     <h1>ОЧЕРЕДЬ</h1>
     <p>Запрос → в процессе → завершить. Статистика у франчайзи обновляется при смене статуса.</p>
 </section>
 
-<div class="av-section-head" style="border-color: rgba(255,255,255,0.2);">
-    <h2 style="color: #fff;">В работе</h2>
-    <span class="av-badge" style="border-color: #fff; color: #fff;" data-production-active-count>{{ visible_orders|length }}</span>
+<div class="av-section-head av-section-head--prod">
+    <h2>В работе</h2>
+    <span class="av-badge av-badge--prod" data-production-active-count>{{ visible_orders|length }}</span>
 </div>
 
 <div id="production-active-wrap">
 {% if visible_orders %}
-    <div class="av-queue" id="production-active-queue">
+    <div class="av-queue av-queue--cards" id="production-active-queue">
         {% for order in visible_orders %}
         {% set allowed = next_statuses_for_production(order.status) %}
-        <div class="av-queue__card" data-order-id="{{ order.id }}" style="background: #000; color: #fff; border: 1px solid #333;">
+        <div class="av-queue__card av-queue__card--dark" data-order-id="{{ order.id }}">
             <div>
-                <p class="av-queue__id" style="color: #737373;">#{{ order.id }}</p>
-                <p class="av-queue__title" style="color: #fff;">{{ order.product_name }}</p>
-                <p class="av-muted" style="color: #a3a3a3; font-size: 0.72rem; letter-spacing: 0.1em;">{{ order.type }} · срок {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
-                <p class="av-queue__id" style="margin-top: 0.5rem;">Статус: <span class="js-order-status">{{ order.status }}</span></p>
+                <p class="av-queue__id av-queue__id--muted">#{{ order.id }}</p>
+                <p class="av-queue__title av-queue__title--light">{{ order.product_name }}</p>
+                <p class="av-muted av-queue__meta">{{ order.type }} · срок {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
+                <p class="av-queue__id av-queue__id--muted" style="margin-top: 0.5rem;">Статус: <span class="js-order-status">{{ order.status }}</span></p>
             </div>
             <div class="av-queue__actions js-production-actions">
                 {% if allowed %}
-                <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form" style="flex-direction: column; width: 100%; gap: 0.75rem;">
+                <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form av-queue__form-btns">
                     {% for s in allowed %}
-                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--xl av-btn--inverse {% if s == 'done' %}av-btn--finish{% endif %}" style="background: #fff; color: #000; border-color: #fff;">
+                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--xl {% if s == 'done' %}av-btn--finish{% endif %}">
                         {% if s == 'in_production' %}В процессе{% elif s == 'done' %}Завершить{% else %}{{ s }}{% endif %}
                     </button>
                     {% endfor %}
@@ -59,7 +59,7 @@
                 <strong style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.85rem;">#{{ order.id }} — {{ order.product_name }}</strong>
                 <p class="av-muted" style="margin: 0.35rem 0 0;">{{ order.user.email }}</p>
             </div>
-            <span class="av-badge">done</span>
+            <span class="av-badge">Завершён</span>
         </li>
         {% endfor %}
     </ul>

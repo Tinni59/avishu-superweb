@@ -1,6 +1,7 @@
 /**
  * AVISHU — mobile-first responsive layer
  * Breakpoints: mobile default | tablet 768px | desktop 1024px
+ * Тёмная тема: переменные --dark-* заданы в styles.css
  */
 
 :root {
@@ -541,36 +542,36 @@ body.av-has-bottom-nav {
 }
 
 .av-theme-dark .av-bottom-nav {
-    background: var(--black);
-    border-top-color: #333;
+    background: var(--dark-bg-elevated);
+    border-top-color: var(--dark-border);
 }
 
 .av-theme-dark .av-bottom-nav a {
-    color: #a3a3a3;
+    color: var(--dark-muted);
 }
 
 .av-theme-dark .av-bottom-nav a:hover,
 .av-theme-dark .av-bottom-nav a[aria-current="page"] {
-    color: var(--white);
-    background: #1a1a1a;
+    color: var(--dark-text);
+    background: var(--dark-bg);
 }
 
 .av-theme-dark .av-theme-toggle {
-    border-color: #333;
-    color: #e5e5e5;
+    border-color: var(--dark-border);
+    color: var(--dark-text);
 }
 
 .av-theme-dark .av-theme-toggle:hover {
-    background: #1a1a1a;
+    background: var(--dark-bg);
 }
 
 .av-theme-dark .av-prod-stat {
-    background: #0a0a0a;
-    border: 1px solid #333;
+    background: var(--dark-bg-elevated);
+    border: 1px solid var(--dark-border);
 }
 
 .av-theme-dark .av-prod-stat__val {
-    color: var(--white);
+    color: var(--dark-text);
 }
 
 /* ——— Tablet 768px ——— */
@@ -582,20 +583,20 @@ body.av-has-bottom-nav {
 
     .av-kanban {
         grid-template-columns: repeat(4, 1fr);
-        gap: 1px;
-        background: var(--black);
-        border: var(--border);
+        gap: 1.25rem;
+        background: transparent;
+        border: none;
     }
 
     .av-kanban__col {
-        border: none;
+        border: var(--border);
     }
 
     .av-metrics {
         grid-template-columns: repeat(2, 1fr);
-        gap: 1px;
-        background: var(--black);
-        border: var(--border);
+        gap: 1.25rem;
+        background: transparent;
+        border: none;
     }
 
     .av-catalog {
@@ -671,9 +672,9 @@ body.av-has-bottom-nav {
     .av-catalog {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 1px;
-        background: var(--black);
-        border: var(--border);
+        gap: 1.25rem;
+        background: transparent;
+        border: none;
     }
 
     .av-product {
@@ -729,16 +730,16 @@ body.av-has-bottom-nav {
     }
 }
 
-/* Dark theme (production): cards on mobile */
+/* Dark theme: order cards */
 .av-theme-dark .av-order-card {
-    background: #0a0a0a;
-    border-color: #333;
+    background: var(--dark-bg-elevated);
+    border-color: var(--dark-border);
 }
 
 .av-theme-dark .av-order-card:hover {
-    background: #141414;
+    background: #3d3d3d;
 }
 
 .av-theme-dark .av-section-head {
-    border-bottom-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: var(--dark-border);
 }

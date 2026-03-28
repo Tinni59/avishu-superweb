@@ -103,26 +103,24 @@
             return s;
         };
         const btnClass = (s) =>
-            s === 'done'
-                ? 'av-btn av-btn--xl av-btn--inverse av-btn--finish'
-                : 'av-btn av-btn--xl av-btn--inverse';
+            s === 'done' ? 'av-btn av-btn--xl av-btn--finish' : 'av-btn av-btn--xl';
         const buttons = next
             .map(
                 (s) =>
-                    `<button type="submit" name="status" value="${s}" class="${btnClass(s)}" style="background:#fff;color:#000;border-color:#fff;">${btnLabel(s)}</button>`
+                    `<button type="submit" name="status" value="${s}" class="${btnClass(s)}">${btnLabel(s)}</button>`
             )
             .join('');
-        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form" style="flex-direction:column;width:100%;gap:0.75rem;">${buttons}</form>`;
+        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form av-queue__form-btns">${buttons}</form>`;
     }
 
     function productionCardHtml(order) {
         return `
-            <div class="av-queue__card" data-order-id="${order.id}" style="background:#000;color:#fff;border:1px solid #333;">
+            <div class="av-queue__card av-queue__card--dark" data-order-id="${order.id}">
                 <div>
-                    <p class="av-queue__id" style="color:#737373;">#${order.id}</p>
-                    <p class="av-queue__title" style="color:#fff;">${escapeHtml(order.product_name)}</p>
-                    <p class="av-muted" style="color:#a3a3a3;font-size:0.72rem;letter-spacing:0.1em;">${escapeHtml(order.type)} · срок ${fmtDate(order.deadline)}</p>
-                    <p class="av-queue__id" style="margin-top:0.5rem;">Статус: <span class="js-order-status">${escapeHtml(order.status)}</span></p>
+                    <p class="av-queue__id av-queue__id--muted">#${order.id}</p>
+                    <p class="av-queue__title av-queue__title--light">${escapeHtml(order.product_name)}</p>
+                    <p class="av-muted av-queue__meta">${escapeHtml(order.type)} · срок ${fmtDate(order.deadline)}</p>
+                    <p class="av-queue__id av-queue__id--muted" style="margin-top:0.5rem;">Статус: <span class="js-order-status">${escapeHtml(order.status)}</span></p>
                 </div>
                 <div class="av-queue__actions js-production-actions">${productionActionCell(order.id, order.status)}</div>
             </div>`;
@@ -346,7 +344,7 @@
                 <strong style="letter-spacing:0.08em;text-transform:uppercase;font-size:0.85rem;">#${order.id} — ${escapeHtml(order.product_name)}</strong>
                 <p class="av-muted" style="margin:0.35rem 0 0;">${escapeHtml(email)}</p>
             </div>
-            <span class="av-badge">done</span>`;
+            <span class="av-badge">Завершён</span>`;
         list.insertBefore(li, list.firstChild);
         const badge = document.querySelector('[data-production-done-count]');
         if (badge) {

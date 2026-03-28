@@ -6,6 +6,12 @@
     color-scheme: light;
     --black: #000000;
     --white: #ffffff;
+    /* Тёмная тема: серый вместо чистого чёрного */
+    --dark-bg: #2a2a2a;
+    --dark-bg-elevated: #353535;
+    --dark-border: #4a4a4a;
+    --dark-text: #f0f0f0;
+    --dark-muted: #a8a8a8;
     --gray-100: #f7f7f7;
     --gray-200: #e8e8e8;
     --gray-300: #d4d4d4;
@@ -40,55 +46,55 @@ body {
     letter-spacing: 0.01em;
 }
 
-/* Цех: высокий контраст */
+/* Тёмная тема: серые тона */
 body.av-theme-dark {
-    background: var(--black);
-    color: var(--white);
+    background: var(--dark-bg);
+    color: var(--dark-text);
 }
 
 .av-theme-dark .av-header {
-    background: var(--black);
-    border-bottom-color: #333;
+    background: var(--dark-bg-elevated);
+    border-bottom-color: var(--dark-border);
 }
 
 .av-theme-dark .av-logo {
-    color: var(--white);
+    color: var(--dark-text);
 }
 
 .av-theme-dark .av-nav a {
-    color: #e5e5e5;
+    color: var(--dark-text);
     border: none;
 }
 
 .av-theme-dark .av-nav a:hover {
-    opacity: 0.7;
+    opacity: 0.75;
 }
 
 .av-theme-dark .av-user {
-    color: #737373;
+    color: var(--dark-muted);
 }
 
 .av-theme-dark .flash {
-    background: #1a1a1a;
-    color: #e5e5e5;
-    border-color: #333;
+    background: var(--dark-bg-elevated);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
 }
 
 .av-theme-dark #realtime-alert {
-    color: #a3a3a3;
-    border-bottom-color: #333;
+    color: var(--dark-muted);
+    border-bottom-color: var(--dark-border);
 }
 
 .av-theme-dark .av-muted {
-    color: #a3a3a3;
+    color: var(--dark-muted);
 }
 
 .av-theme-dark .av-section-head {
-    border-bottom-color: #333;
+    border-bottom-color: var(--dark-border);
 }
 
 .av-theme-dark h2 {
-    color: var(--white);
+    color: var(--dark-text);
 }
 
 /* Заголовки — только uppercase */
@@ -297,7 +303,7 @@ a:hover {
     display: none;
 }
 
-/* ——— Buttons (custom) ——— */
+/* ——— Buttons: единый стиль (белый фон, чёрный текст, обводка; hover — инверсия) ——— */
 .av-btn {
     appearance: none;
     -webkit-appearance: none;
@@ -316,22 +322,39 @@ a:hover {
     background: var(--white);
     color: var(--black);
     cursor: pointer;
-    transition: background 0.2s var(--ease), color 0.2s var(--ease), opacity 0.2s var(--ease);
+    transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
 .av-btn:hover {
     background: var(--black);
     color: var(--white);
+    border-color: var(--black);
 }
 
 .av-btn--inverse {
-    background: var(--black);
-    color: var(--white);
+    background: var(--white);
+    color: var(--black);
+    border: var(--border);
 }
 
 .av-btn--inverse:hover {
-    background: var(--white);
-    color: var(--black);
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.av-theme-dark .av-btn,
+.av-theme-dark .av-btn--inverse {
+    background: var(--dark-bg-elevated);
+    color: var(--dark-text);
+    border: 1px solid var(--dark-border);
+}
+
+.av-theme-dark .av-btn:hover,
+.av-theme-dark .av-btn--inverse:hover {
+    background: var(--dark-text);
+    color: var(--dark-bg);
+    border-color: var(--dark-text);
 }
 
 .av-btn--lg {
@@ -358,12 +381,25 @@ a:hover {
 }
 
 .av-btn--ghost {
-    background: transparent;
+    background: var(--white);
+    color: var(--black);
+    border: var(--border);
 }
 
 .av-btn--ghost:hover {
-    background: var(--gray-100);
-    color: var(--black);
+    background: var(--black);
+    color: var(--white);
+}
+
+.av-theme-dark .av-btn--ghost {
+    background: var(--dark-bg-elevated);
+    color: var(--dark-text);
+    border: 1px solid var(--dark-border);
+}
+
+.av-theme-dark .av-btn--ghost:hover {
+    background: var(--dark-text);
+    color: var(--dark-bg);
 }
 
 /* ——— Forms ——— */
@@ -458,13 +494,15 @@ a:hover {
 .av-catalog {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--black);
-    border: var(--border);
+    gap: 1.25rem;
+    background: transparent;
+    border: none;
 }
 
+/* Карточки витрины: белые, тонкая чёрная обводка */
 .av-product {
     background: var(--white);
+    border: var(--border);
     padding: 2rem 1.75rem;
     display: flex;
     flex-direction: column;
@@ -686,14 +724,15 @@ a:hover {
 .av-metrics {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1px;
-    background: var(--black);
-    border: var(--border);
+    gap: 1.25rem;
+    background: transparent;
+    border: none;
     margin-bottom: 3rem;
 }
 
 .av-metric {
     background: var(--white);
+    border: var(--border);
     padding: 2rem 1.75rem;
 }
 
@@ -714,9 +753,9 @@ a:hover {
 .av-kanban {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--black);
-    border: var(--border);
+    gap: 1.25rem;
+    background: transparent;
+    border: none;
     margin-bottom: 3rem;
 }
 
@@ -734,8 +773,65 @@ a:hover {
 
 .av-kanban__col {
     background: var(--white);
+    border: var(--border);
     padding: 1.25rem 1rem;
     min-height: 100px;
+}
+
+.av-section-head--filter {
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.av-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.av-filter-tab {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.65rem 1.1rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--black);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.av-filter-tab:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+.av-filter-tab.is-active {
+    background: var(--black);
+    color: var(--white);
+}
+
+.av-theme-dark .av-metric,
+.av-theme-dark .av-kanban__col {
+    background: var(--dark-bg-elevated);
+    border-color: var(--dark-border);
+}
+
+.av-theme-dark .av-filter-tab {
+    background: var(--dark-bg-elevated);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.av-theme-dark .av-filter-tab:hover,
+.av-theme-dark .av-filter-tab.is-active {
+    background: var(--dark-text);
+    color: var(--dark-bg);
+    border-color: var(--dark-text);
 }
 
 .av-kanban__head {
@@ -772,12 +868,111 @@ a:hover {
     font-weight: 400;
 }
 
+body:not(.av-theme-dark) .av-prod-hero--queue {
+    background: var(--white);
+    color: var(--black);
+    border: var(--border);
+}
+
+body:not(.av-theme-dark) .av-prod-hero--queue h1 {
+    color: var(--black);
+}
+
+body:not(.av-theme-dark) .av-prod-hero--queue p {
+    color: var(--gray-600);
+}
+
+.av-section-head--prod {
+    border-bottom-color: var(--hairline);
+}
+
+body.av-theme-dark .av-section-head--prod {
+    border-bottom-color: var(--dark-border);
+}
+
+body.av-theme-dark .av-section-head--prod h2 {
+    color: var(--dark-text);
+}
+
+body.av-theme-dark .av-prod-hero--queue {
+    background: var(--dark-bg-elevated);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+body.av-theme-dark .av-prod-hero--queue h1 {
+    color: var(--dark-text);
+}
+
+body.av-theme-dark .av-prod-hero--queue p {
+    color: var(--dark-muted);
+}
+
+.av-badge--prod {
+    border: var(--border);
+    color: inherit;
+}
+
+body.av-theme-dark .av-badge--prod {
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+.av-queue--cards {
+    gap: 1.25rem;
+    background: transparent;
+    border: none;
+}
+
+.av-queue__card--dark {
+    background: var(--dark-bg-elevated);
+    color: var(--dark-text);
+    border: 1px solid var(--dark-border);
+}
+
+body:not(.av-theme-dark) .av-queue__card--dark {
+    background: var(--white);
+    color: var(--black);
+    border: var(--border);
+}
+
+.av-queue__id--muted {
+    color: var(--gray-500);
+}
+
+body.av-theme-dark .av-queue__id--muted {
+    color: var(--dark-muted);
+}
+
+.av-queue__title--light {
+    color: var(--black);
+}
+
+body.av-theme-dark .av-queue__title--light {
+    color: var(--dark-text);
+}
+
+.av-queue__meta {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+}
+
+body.av-theme-dark .av-queue__meta {
+    color: var(--dark-muted) !important;
+}
+
+.av-queue__form-btns {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+}
+
 .av-prod-stats {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1px;
-    background: var(--black);
-    border: var(--border);
+    gap: 1.25rem;
+    background: transparent;
+    border: none;
     margin-bottom: 2rem;
     max-width: 100%;
 }
@@ -790,6 +985,7 @@ a:hover {
 
 .av-prod-stat {
     background: var(--white);
+    border: var(--border);
     padding: 2rem 1.5rem;
     text-align: center;
 }
@@ -811,9 +1007,9 @@ a:hover {
 
 .av-queue {
     display: grid;
-    gap: 1px;
-    background: var(--black);
-    border: var(--border);
+    gap: 1.25rem;
+    background: transparent;
+    border: none;
 }
 
 .av-queue__card {
