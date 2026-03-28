@@ -36,6 +36,7 @@ def create_app(test_config=None):
     login_manager.init_app(app)
     socketio.init_app(app)
     login_manager.login_view = "auth.login"
+    login_manager.login_message = "Авторизуйтесь, чтобы продолжить."
     login_manager.login_message = gettext(DEFAULT_LOCALE, "login_required")
     login_manager.localize_callback = lambda: gettext(
         normalize_locale(request.cookies.get("av_lang")),
