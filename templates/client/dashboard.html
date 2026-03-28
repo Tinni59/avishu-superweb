@@ -72,13 +72,13 @@
                 <form method="post" action="{{ url_for('client.cart') }}" id="form-add-cart">
                     <input type="hidden" name="product_name" id="cart-product-name">
                     <input type="hidden" name="type" value="in_stock">
-                    <button type="submit" class="av-btn av-btn--lg av-btn--block"><span class="av-btn__desktop">Добавить в корзину</span><span class="av-btn__mobile">ADD TO BAG</span></button>
+                    <button type="submit" class="av-btn av-btn--lg av-btn--block"><span class="av-btn__desktop">Добавить в корзину</span><span class="av-btn__mobile">ДОБАВИТЬ В КОРЗИНУ</span></button>
                 </form>
                 <form method="post" action="{{ url_for('client.create_order') }}">
                     <input type="hidden" name="product_name" id="buy-product-name">
                     <input type="hidden" name="type" value="in_stock">
                     <input type="hidden" name="next" value="{{ url_for('client.orders') }}">
-                    <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block"><span class="av-btn__desktop">Купить</span><span class="av-btn__mobile">BUY</span></button>
+                    <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block"><span class="av-btn__desktop">Купить</span><span class="av-btn__mobile">КУПИТЬ</span></button>
                 </form>
             </div>
 
@@ -87,7 +87,7 @@
                     <input type="hidden" name="product_name" id="preorder-product-name">
                     <input type="hidden" name="type" value="preorder">
                     <input type="hidden" name="next" value="{{ url_for('client.orders') }}">
-                    <button type="submit" class="av-btn av-btn--xl av-btn--inverse av-btn--block"><span class="av-btn__desktop">Оформить предзаказ</span><span class="av-btn__mobile">PREORDER</span></button>
+                    <button type="submit" class="av-btn av-btn--xl av-btn--inverse av-btn--block"><span class="av-btn__desktop">Оформить предзаказ</span><span class="av-btn__mobile">ПРЕДЗАКАЗ</span></button>
                 </form>
             </div>
         </div>
