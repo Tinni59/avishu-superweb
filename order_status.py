@@ -1,12 +1,13 @@
 """Строгие правила переходов статусов заказов."""
 
+from i18n import gettext
+
 ORDER_TYPES = ("in_stock", "preorder")
 ORDER_STATUSES = ("created", "accepted", "in_production", "done")
 
-# Франчайзи: created → accepted → in_production
+# Франчайзи: только принятие новых заказов; дальше — производство
 _FRANCHISEE_EDGES = {
     "created": frozenset({"accepted"}),
-    "accepted": frozenset({"in_production"}),
 }
 
 # Производство: accepted → in_production → done (без пропуска шага)
@@ -16,12 +17,12 @@ _PRODUCTION_EDGES = {
 }
 
 
-def validate_new_order(order_type: str, deadline):
+def validate_new_order(order_type: str, deadline, locale: str = "ru"):
     """preorder требует дедлайн; in_stock — дедлайн не обязателен."""
     if order_type not in ORDER_TYPES:
-        return False, "Некорректный тип заказа."
+        return False, gettext(locale, "err_invalid_order_type")
     if order_type == "preorder" and deadline is None:
-        return False, "Для предзаказа укажите дедлайн."
+        return False, gettext(locale, "err_preorder_deadline")
     return True, None
 
 

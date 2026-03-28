@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 
+from i18n import flash_message, normalize_locale
 from catalog import get_catalog
 from extensions import db
 from models import Order
@@ -81,18 +82,19 @@ def orders():
 @login_required
 @role_required("client")
 def cart():
+    loc = normalize_locale(request.cookies.get("av_lang"))
     if request.method == "POST":
         product_name = request.form.get("product_name", "").strip()
         order_type = request.form.get("type", "").strip()
         deadline = _parse_deadline_form(request.form.get("deadline", ""))
 
-        ok, err = validate_new_order(order_type, deadline)
+        ok, err = validate_new_order(order_type, deadline, locale=loc)
         if not ok:
             flash(err, "error")
             return redirect(url_for("client.dashboard"))
 
         if not product_name:
-            flash("Товар не указан.", "error")
+            flash(flash_message(loc, "flash_product_missing"), "error")
             return redirect(url_for("client.dashboard"))
 
         cart = _session_cart()
@@ -105,7 +107,7 @@ def cart():
         )
         session["cart"] = cart
         session.modified = True
-        flash("Добавлено в корзину.", "success")
+        flash(flash_message(loc, "flash_cart_added"), "success")
         return redirect(url_for("client.dashboard"))
 
     return render_template("client/cart.html", cart=_session_cart())
@@ -115,9 +117,10 @@ def cart():
 @login_required
 @role_required("client")
 def checkout_cart():
+    loc = normalize_locale(request.cookies.get("av_lang"))
     cart = _session_cart()
     if not cart:
-        flash("Корзина пуста.", "error")
+        flash(flash_message(loc, "flash_cart_empty"), "error")
         return redirect(url_for("client.cart"))
 
     for item in cart:
@@ -128,7 +131,7 @@ def checkout_cart():
                 deadline = datetime.fromisoformat(item["deadline"])
             except (ValueError, TypeError):
                 deadline = None
-        ok, err = validate_new_order(order_type, deadline)
+        ok, err = validate_new_order(order_type, deadline, locale=loc)
         if not ok:
             flash(err, "error")
             return redirect(url_for("client.cart"))
@@ -136,7 +139,7 @@ def checkout_cart():
 
     session["cart"] = []
     session.modified = True
-    flash("Заказ оформлен.", "success")
+    flash(flash_message(loc, "flash_checkout_ok"), "success")
     return redirect(url_for("client.orders"))
 
 
@@ -144,21 +147,22 @@ def checkout_cart():
 @login_required
 @role_required("client")
 def create_order():
+    loc = normalize_locale(request.cookies.get("av_lang"))
     product_name = request.form.get("product_name", "").strip()
     order_type = request.form.get("type", "").strip()
     deadline = _parse_deadline_form(request.form.get("deadline", ""))
 
-    ok, err = validate_new_order(order_type, deadline)
+    ok, err = validate_new_order(order_type, deadline, locale=loc)
     if not ok:
         flash(err, "error")
         return redirect(request.referrer or url_for("client.dashboard"))
 
     if not product_name:
-        flash("Укажите название продукта.", "error")
+        flash(flash_message(loc, "flash_product_name_required"), "error")
         return redirect(request.referrer or url_for("client.dashboard"))
 
     _create_order_for_user(product_name, order_type, deadline)
 
-    flash("Заказ создан.", "success")
+    flash(flash_message(loc, "flash_order_created"), "success")
     next_url = request.form.get("next") or url_for("client.orders")
     return redirect(next_url)

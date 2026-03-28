@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
+from i18n import flash_message, normalize_locale
 from extensions import db
 from models import Order
 from order_events import emit_order_updated
@@ -62,12 +63,18 @@ def orders():
 @login_required
 @role_required("franchisee")
 def update_order_status(order_id):
+    loc = normalize_locale(request.cookies.get("av_lang"))
     order = Order.query.get_or_404(order_id)
     new_status = request.form.get("status", "").strip()
 
     if not is_valid_franchisee_transition(order.status, new_status):
         flash(
-            f"Переход из «{order.status}» в «{new_status}» недопустим.",
+            flash_message(
+                loc,
+                "flash_transition_error",
+                current=order.status,
+                new=new_status,
+            ),
             "error",
         )
         return redirect(url_for("franchisee.orders"))
@@ -76,5 +83,5 @@ def update_order_status(order_id):
     order.status = new_status
     db.session.commit()
     emit_order_updated(order, current_user.role, previous_status=previous_status)
-    flash("Статус заказа обновлён.", "success")
+    flash(flash_message(loc, "flash_status_updated"), "success")
     return redirect(url_for("franchisee.orders"))
