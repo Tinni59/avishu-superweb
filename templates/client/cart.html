@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Корзина | AVISHU{% endblock %}
+{% block title %}{{ t('client_cart_title') }}{% endblock %}
 
 {% block content %}
 <div class="av-section-head">
-    <h2>Корзина</h2>
-    <a class="av-muted" href="{{ url_for('client.dashboard') }}">Витрина</a>
+    <h2>{{ t('cart_heading') }}</h2>
+    <a class="av-muted" href="{{ url_for('client.dashboard') }}">{{ t('link_showcase') }}</a>
 </div>
 
 {% if cart %}
@@ -13,7 +13,7 @@
         {% for line in cart %}
         <article class="av-order-card">
             <h3 class="av-order-card__title">{{ line.product_name }}</h3>
-            <p class="av-order-card__meta">{{ line.type }} · {% if line.deadline %}{{ line.deadline[:10] }}{% else %}—{% endif %}</p>
+            <p class="av-order-card__meta">{{ label_order_type(line.type) }} · {% if line.deadline %}{{ line.deadline[:10] }}{% else %}—{% endif %}</p>
         </article>
         {% endfor %}
     </div>
@@ -21,16 +21,16 @@
         <table class="av-table">
             <thead>
                 <tr>
-                    <th>Изделие</th>
-                    <th>Тип</th>
-                    <th>Дедлайн</th>
+                    <th>{{ t('table_product') }}</th>
+                    <th>{{ t('table_type') }}</th>
+                    <th>{{ t('table_deadline') }}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for line in cart %}
                 <tr>
                     <td>{{ line.product_name }}</td>
-                    <td>{{ line.type }}</td>
+                    <td>{{ label_order_type(line.type) }}</td>
                     <td>{% if line.deadline %}{{ line.deadline[:10] }}{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
@@ -38,10 +38,10 @@
         </table>
     </div>
     <form method="post" action="{{ url_for('client.checkout_cart') }}">
-        <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block">Оформить заказ</button>
+        <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block">{{ t('cart_checkout') }}</button>
     </form>
 {% else %}
-    <p class="av-muted">Корзина пуста.</p>
-    <a class="av-btn av-btn--lg av-btn--inverse" href="{{ url_for('client.dashboard') }}">На витрину</a>
+    <p class="av-muted">{{ t('cart_empty') }}</p>
+    <a class="av-btn av-btn--lg av-btn--inverse" href="{{ url_for('client.dashboard') }}">{{ t('cart_to_showcase') }}</a>
 {% endif %}
 {% endblock %}

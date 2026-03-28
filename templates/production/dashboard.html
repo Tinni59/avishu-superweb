@@ -1,33 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Цех | AVISHU{% endblock %}
+{% block title %}{{ t('production_dashboard_title') }}{% endblock %}
 
 {% block content %}
 <section class="av-prod-hero">
-    <p class="av-kicker" style="color: #a3a3a3; font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 1rem;">Планшет мастера</p>
-    <h1>ПРОИЗВОДСТВО</h1>
-    <p>Очередь задач на пошив. Крупные кнопки — минимум текста. Статус пишется в базу при нажатии.</p>
+    <p class="av-kicker" style="color: #a3a3a3; font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 1rem;">{{ t('pd_kicker') }}</p>
+    <h1>{{ t('pd_title') }}</h1>
+    <p>{{ t('pd_lead') }}</p>
 </section>
 
 <div class="av-prod-stats" id="production-stats">
     <article class="av-prod-stat">
-        <p class="av-prod-stat__label">Запрос</p>
+        <p class="av-prod-stat__label">{{ t('pd_stat_request') }}</p>
         <p class="av-prod-stat__val" data-prod-stat="requested">{{ stats.requested }}</p>
-        <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">Ожидают (accepted)</p>
+        <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">{{ t('pd_stat_request_sub') }}</p>
     </article>
     <article class="av-prod-stat">
-        <p class="av-prod-stat__label">В процессе</p>
+        <p class="av-prod-stat__label">{{ t('pd_stat_progress') }}</p>
         <p class="av-prod-stat__val" data-prod-stat="in_progress">{{ stats.in_progress }}</p>
-        <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">Пошив (in_production)</p>
+        <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">{{ t('pd_stat_progress_sub') }}</p>
     </article>
     <article class="av-prod-stat">
-        <p class="av-prod-stat__label">Завершено</p>
+        <p class="av-prod-stat__label">{{ t('pd_stat_done') }}</p>
         <p class="av-prod-stat__val" data-prod-stat="completed">{{ stats.completed }}</p>
-        <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">Готово (done)</p>
+        <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">{{ t('pd_stat_done_sub') }}</p>
     </article>
 </div>
 
 <div style="margin-top: 2.5rem;">
-    <a class="av-btn av-btn--inverse" href="{{ url_for('production.orders') }}">Открыть очередь</a>
+    <a class="av-btn av-btn--inverse" href="{{ url_for('production.orders') }}">{{ t('pd_open_queue') }}</a>
 </div>
 {% endblock %}

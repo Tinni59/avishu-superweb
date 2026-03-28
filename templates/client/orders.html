@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}Заказы и профиль | AVISHU{% endblock %}
+{% block title %}{{ t('client_orders_title') }}{% endblock %}
 
 {% block content %}
 <div class="av-section-head">
-    <h2>Заказы</h2>
-    <a class="av-muted" href="{{ url_for('client.dashboard') }}">Витрина</a>
+    <h2>{{ t('orders_page_heading') }}</h2>
+    <a class="av-muted" href="{{ url_for('client.dashboard') }}">{{ t('link_showcase') }}</a>
 </div>
 
-<section class="av-loyalty" id="client-loyalty" data-order-total="{{ orders|length }}">
-    <h3 class="av-h" style="font-size: 0.72rem;">Программа лояльности</h3>
-    <p class="av-muted" style="margin: 0;">Базовый уровень — накопление по числу заказов</p>
+<section class="av-loyalty" id="client-loyalty" data-order-total="{{ orders|length }}" data-loyalty-template="{{ t('loyalty_label_js') }}">
+    <h3 class="av-h" style="font-size: 0.72rem;">{{ t('loyalty_heading') }}</h3>
+    <p class="av-muted" style="margin: 0;">{{ t('loyalty_sub') }}</p>
     <div class="av-loyalty__bar" role="progressbar" aria-valuenow="{{ loyalty_pct }}" aria-valuemin="0" aria-valuemax="100">
         <div class="av-loyalty__fill" id="client-loyalty-fill" style="width: {{ loyalty_pct }}%;"></div>
     </div>
-    <p class="av-muted" id="client-loyalty-label" style="margin: 0.75rem 0 0; font-size: 0.7rem;"><span id="client-loyalty-pct">{{ loyalty_pct }}</span>% до следующего уровня (демо)</p>
+    <p class="av-muted" id="client-loyalty-label" style="margin: 0.75rem 0 0; font-size: 0.7rem;">{{ t('loyalty_label', pct=loyalty_pct) }}</p>
 </section>
 
 {% if orders %}
     {% for order in orders %}
     {% if loop.first %}
     <section class="av-track" id="client-order-track" data-order-id="{{ order.id }}">
-        <h3 class="av-h" style="font-size: 0.72rem;">Активный заказ #{{ order.id }}</h3>
+        <h3 class="av-h" style="font-size: 0.72rem;">{{ t('active_order_heading', id=order.id) }}</h3>
         <p class="av-muted" style="margin: 0 0 1rem;">{{ order.product_name }}</p>
         <div class="av-track__steps">
-            <div class="av-step av-step--on">Оформлен</div>
-            <div class="av-step {% if order.status in ['accepted', 'in_production', 'done'] %}av-step--on{% endif %}">Пошив</div>
-            <div class="av-step {% if order.status == 'done' %}av-step--on{% endif %}">Готов</div>
+            <div class="av-step av-step--on">{{ t('track_placed') }}</div>
+            <div class="av-step {% if order.status in ['accepted', 'in_production', 'done'] %}av-step--on{% endif %}">{{ t('track_sewing') }}</div>
+            <div class="av-step {% if order.status == 'done' %}av-step--on{% endif %}">{{ t('track_ready') }}</div>
         </div>
     </section>
     {% endif %}
@@ -34,7 +34,7 @@
 {% endif %}
 
 <div class="av-section-head">
-    <h2>Все заказы</h2>
+    <h2>{{ t('all_orders_heading') }}</h2>
     <span class="av-badge" data-client-order-count>{{ orders|length }}</span>
 </div>
 
@@ -45,10 +45,10 @@
         <article class="av-order-card" data-order-id="{{ order.id }}">
             <div class="av-order-card__top">
                 <span class="av-order-card__id">#{{ order.id }}</span>
-                <span class="av-badge status">{{ order.status }}</span>
+                <span class="av-badge status">{{ label_order_status(order.status) }}</span>
             </div>
             <h3 class="av-order-card__title">{{ order.product_name }}</h3>
-            <p class="av-order-card__meta">{{ order.type }} · {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
+            <p class="av-order-card__meta">{{ label_order_type(order.type) }} · {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
             <p class="av-order-card__meta">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
         </article>
         {% endfor %}
@@ -58,12 +58,12 @@
         <table class="av-table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Изделие</th>
-                    <th>Тип</th>
-                    <th>Статус</th>
-                    <th>Дедлайн</th>
-                    <th>Создан</th>
+                    <th>{{ t('table_id') }}</th>
+                    <th>{{ t('table_product') }}</th>
+                    <th>{{ t('table_type') }}</th>
+                    <th>{{ t('table_status') }}</th>
+                    <th>{{ t('table_deadline') }}</th>
+                    <th>{{ t('table_created') }}</th>
                 </tr>
             </thead>
             <tbody id="client-orders-tbody">
@@ -71,8 +71,8 @@
                 <tr data-order-id="{{ order.id }}">
                     <td>#{{ order.id }}</td>
                     <td>{{ order.product_name }}</td>
-                    <td>{{ order.type }}</td>
-                    <td class="status">{{ order.status }}</td>
+                    <td>{{ label_order_type(order.type) }}</td>
+                    <td class="status">{{ label_order_status(order.status) }}</td>
                     <td>{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</td>
                     <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                 </tr>
@@ -81,7 +81,7 @@
         </table>
     </div>
 {% else %}
-    <p class="empty-state av-muted">Заказов пока нет.</p>
+    <p class="empty-state av-muted">{{ t('orders_empty') }}</p>
 {% endif %}
 </div>
 {% endblock %}

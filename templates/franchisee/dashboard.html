@@ -1,54 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}Башня управления | AVISHU{% endblock %}
+{% block title %}{{ t('franchisee_dashboard_title') }}{% endblock %}
 
 {% block content %}
 <div class="av-section-head">
-    <h2>Башня управления</h2>
-    <p class="av-muted">B2B · партнёрская зона</p>
+    <h2>{{ t('fd_heading') }}</h2>
+    <p class="av-muted">{{ t('fd_sub') }}</p>
 </div>
 
 <div class="av-metrics">
     <div class="av-metric">
         <div class="av-metric__val">{{ revenue_stub }}</div>
-        <div class="av-metric__label">Выручка за сегодня</div>
-        <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.65rem;">Заглушка метрики</p>
+        <div class="av-metric__label">{{ t('fd_revenue_label') }}</div>
+        <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.65rem;">{{ t('fd_metric_stub') }}</p>
     </div>
     <div class="av-metric">
         <div class="av-metric__val">{{ plan_stub }}</div>
-        <div class="av-metric__label">Выполнение плана</div>
-        <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.65rem;">Заглушка KPI</p>
+        <div class="av-metric__label">{{ t('fd_plan_label') }}</div>
+        <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.65rem;">{{ t('fd_kpi_stub') }}</p>
     </div>
 </div>
 
 <div class="av-section-head av-section-head--filter">
-    <h2>Воронка заказов</h2>
-    <div class="av-filter-tabs" role="tablist" aria-label="Период статистики">
-        <a class="av-filter-tab {% if stats_period == 'today' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='today') }}">Сегодня</a>
-        <a class="av-filter-tab {% if stats_period == 'week' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='week') }}">Неделя</a>
-        <a class="av-filter-tab {% if stats_period == 'month' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='month') }}">Месяц</a>
+    <h2>{{ t('fd_funnel_heading') }}</h2>
+    <div class="av-filter-tabs" role="tablist" aria-label="{{ t('fd_period_label') }}">
+        <a class="av-filter-tab {% if stats_period == 'today' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='today') }}">{{ t('fd_period_today') }}</a>
+        <a class="av-filter-tab {% if stats_period == 'week' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='week') }}">{{ t('fd_period_week') }}</a>
+        <a class="av-filter-tab {% if stats_period == 'month' %}is-active{% endif %}" href="{{ url_for('franchisee.dashboard', period='month') }}">{{ t('fd_period_month') }}</a>
     </div>
 </div>
-<p class="av-muted" style="margin: -1.5rem 0 2rem; font-size: 0.72rem;">Заказы по дате создания в выбранном периоде</p>
+<p class="av-muted" style="margin: -1.5rem 0 2rem; font-size: 0.72rem;">{{ t('fd_period_hint') }}</p>
 
 <div class="av-kanban" id="franchisee-kanban" data-franchisee-period="{{ stats_period }}">
     <div class="av-kanban__col" data-funnel-status="created">
-        <div class="av-kanban__head">Новые</div>
+        <div class="av-kanban__head">{{ t('fd_kanban_new') }}</div>
         <div class="av-kanban__count" data-kanban-count="created">{{ order_counts.created }}</div>
     </div>
     <div class="av-kanban__col" data-funnel-status="accepted">
-        <div class="av-kanban__head">Принято</div>
+        <div class="av-kanban__head">{{ t('fd_kanban_accepted') }}</div>
         <div class="av-kanban__count" data-kanban-count="accepted">{{ order_counts.accepted }}</div>
     </div>
     <div class="av-kanban__col" data-funnel-status="in_production">
-        <div class="av-kanban__head">В работе</div>
+        <div class="av-kanban__head">{{ t('fd_kanban_work') }}</div>
         <div class="av-kanban__count" data-kanban-count="in_production">{{ order_counts.in_production }}</div>
     </div>
     <div class="av-kanban__col" data-funnel-status="done">
-        <div class="av-kanban__head">Готово</div>
+        <div class="av-kanban__head">{{ t('fd_kanban_done') }}</div>
         <div class="av-kanban__count" data-kanban-count="done">{{ order_counts.done }}</div>
     </div>
 </div>
 
-<p class="av-muted">Новые заказы и смена статусов — в реальном времени на странице <a href="{{ url_for('franchisee.orders') }}">заказов</a>.</p>
+<p class="av-muted">{{ t('fd_realtime_hint') }} <a href="{{ url_for('franchisee.orders') }}">{{ t('fd_orders_link') }}</a>.</p>
 {% endblock %}

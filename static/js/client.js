@@ -5,6 +5,16 @@
     const raw = document.getElementById('catalog-json');
     if (!raw) return;
 
+    let modalI18n = { carousel_prev: 'Предыдущее фото', carousel_next: 'Следующее фото' };
+    const i18nRaw = document.getElementById('client-modal-i18n');
+    if (i18nRaw) {
+        try {
+            modalI18n = JSON.parse(i18nRaw.textContent);
+        } catch (e) {
+            /* keep defaults */
+        }
+    }
+
     let catalog = [];
     try {
         catalog = JSON.parse(raw.textContent);
@@ -49,8 +59,8 @@
         const multiClass = multi ? ' av-carousel--has-multiple' : '';
         const arrows = multi
             ? `
-                <button type="button" class="av-carousel__arrow av-carousel__arrow--prev" aria-label="Предыдущее фото">‹</button>
-                <button type="button" class="av-carousel__arrow av-carousel__arrow--next" aria-label="Следующее фото">›</button>
+                <button type="button" class="av-carousel__arrow av-carousel__arrow--prev" aria-label="${escapeAttr(modalI18n.carousel_prev)}">‹</button>
+                <button type="button" class="av-carousel__arrow av-carousel__arrow--next" aria-label="${escapeAttr(modalI18n.carousel_next)}">›</button>
                 <div class="av-carousel__dots" aria-hidden="true"></div>`
             : '';
         return `<div class="av-carousel${multiClass}" data-carousel>

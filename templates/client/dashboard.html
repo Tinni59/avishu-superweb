@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Витрина | AVISHU{% endblock %}
+{% block title %}{{ t('client_showcase_title') }}{% endblock %}
 
 {% block content %}
 <section class="av-hero">
-    <p class="av-hero__kicker">Коллекция / сезон</p>
-    <h1 class="av-hero__title">ВЕСНА 2026</h1>
-    <p class="av-hero__lead">Минимализм, плотные ткани, линия силуэта. Ограниченные партии и предзаказ по календарю.</p>
-    <a class="av-btn av-btn--inverse" href="#catalog">Смотреть витрину</a>
+    <p class="av-hero__kicker">{{ t('hero_kicker') }}</p>
+    <h1 class="av-hero__title">{{ t('hero_title') }}</h1>
+    <p class="av-hero__lead">{{ t('hero_lead') }}</p>
+    <a class="av-btn av-btn--inverse" href="#catalog">{{ t('hero_cta') }}</a>
 </section>
 
 <section id="catalog">
     <div class="av-section-head">
-        <h2>Каталог</h2>
-        <p class="av-muted">Выберите изделие</p>
+        <h2>{{ t('catalog_heading') }}</h2>
+        <p class="av-muted">{{ t('catalog_sub') }}</p>
     </div>
 
     <div class="av-catalog">
         {% if not catalog %}
-        <p class="av-muted" style="grid-column: 1 / -1;">Каталог пуст. Добавьте изображения в <code>static/images/catalog/</code> (имена: «Название 1.jpg», «Название 2.jpg», …) или выполните <code>python seed_catalog.py</code> после загрузки файлов.</p>
+        <p class="av-muted" style="grid-column: 1 / -1;">{{ t('catalog_empty') }}</p>
         {% endif %}
         {% for item in catalog %}
         <article class="av-product" data-product-id="{{ item.id }}">
@@ -34,8 +34,8 @@
                     </div>
                 </div>
                 {% if item.images|length > 1 %}
-                <button type="button" class="av-carousel__arrow av-carousel__arrow--prev" aria-label="Предыдущее фото">‹</button>
-                <button type="button" class="av-carousel__arrow av-carousel__arrow--next" aria-label="Следующее фото">›</button>
+                <button type="button" class="av-carousel__arrow av-carousel__arrow--prev" aria-label="{{ t('carousel_prev') }}">‹</button>
+                <button type="button" class="av-carousel__arrow av-carousel__arrow--next" aria-label="{{ t('carousel_next') }}">›</button>
                 <div class="av-carousel__dots" aria-hidden="true"></div>
                 {% endif %}
             </div>
@@ -43,8 +43,8 @@
             <div class="av-product__body">
                 <p class="av-product__line">{{ item.line }}</p>
                 <h3 class="av-product__name">{{ item.name }}</h3>
-                <p class="av-product__meta">{{ item.price }} · {% if item.type == 'in_stock' %}в наличии{% else %}предзаказ{% endif %}</p>
-                <button type="button" class="av-btn av-btn--ghost av-product__open" data-open-modal>Подробнее</button>
+                <p class="av-product__meta">{{ item.price }} · {% if item.type == 'in_stock' %}{{ t('type_in_stock') }}{% else %}{{ t('type_preorder') }}{% endif %}</p>
+                <button type="button" class="av-btn av-btn--ghost av-product__open" data-open-modal>{{ t('btn_details') }}</button>
             </div>
         </article>
         {% endfor %}
@@ -54,7 +54,7 @@
 <div id="product-modal" class="av-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="av-modal__backdrop" data-close-modal></div>
     <div class="av-modal__panel">
-        <button type="button" class="av-modal__close" data-close-modal aria-label="Закрыть">×</button>
+        <button type="button" class="av-modal__close" data-close-modal aria-label="{{ t('modal_close') }}">×</button>
         <div id="modal-carousel-host" class="av-modal__carousel"></div>
         <h2 id="modal-title" class="av-modal__title av-h"></h2>
         <p class="av-modal__price" id="modal-price"></p>
@@ -62,7 +62,7 @@
 
         <div id="modal-preorder-fields" class="hidden">
             <div class="av-field">
-                <span>Дата готовности</span>
+                <span>{{ t('modal_ready_date') }}</span>
                 <input class="av-input" type="date" id="modal-deadline" name="deadline" form="modal-preorder-form">
             </div>
         </div>
@@ -72,13 +72,13 @@
                 <form method="post" action="{{ url_for('client.cart') }}" id="form-add-cart">
                     <input type="hidden" name="product_name" id="cart-product-name">
                     <input type="hidden" name="type" value="in_stock">
-                    <button type="submit" class="av-btn av-btn--lg av-btn--block"><span class="av-btn__desktop">Добавить в корзину</span><span class="av-btn__mobile">ДОБАВИТЬ В КОРЗИНУ</span></button>
+                    <button type="submit" class="av-btn av-btn--lg av-btn--block"><span class="av-btn__desktop">{{ t('btn_add_cart_desktop') }}</span><span class="av-btn__mobile">{{ t('btn_add_cart_mobile') }}</span></button>
                 </form>
                 <form method="post" action="{{ url_for('client.create_order') }}">
                     <input type="hidden" name="product_name" id="buy-product-name">
                     <input type="hidden" name="type" value="in_stock">
                     <input type="hidden" name="next" value="{{ url_for('client.orders') }}">
-                    <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block"><span class="av-btn__desktop">Купить</span><span class="av-btn__mobile">КУПИТЬ</span></button>
+                    <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block"><span class="av-btn__desktop">{{ t('btn_buy_desktop') }}</span><span class="av-btn__mobile">{{ t('btn_buy_mobile') }}</span></button>
                 </form>
             </div>
 
@@ -87,7 +87,7 @@
                     <input type="hidden" name="product_name" id="preorder-product-name">
                     <input type="hidden" name="type" value="preorder">
                     <input type="hidden" name="next" value="{{ url_for('client.orders') }}">
-                    <button type="submit" class="av-btn av-btn--xl av-btn--inverse av-btn--block"><span class="av-btn__desktop">Оформить предзаказ</span><span class="av-btn__mobile">ПРЕДЗАКАЗ</span></button>
+                    <button type="submit" class="av-btn av-btn--xl av-btn--inverse av-btn--block"><span class="av-btn__desktop">{{ t('btn_preorder_desktop') }}</span><span class="av-btn__mobile">{{ t('btn_preorder_mobile') }}</span></button>
                 </form>
             </div>
         </div>
@@ -95,6 +95,7 @@
 </div>
 
 <script type="application/json" id="catalog-json">{{ catalog | tojson }}</script>
+<script type="application/json" id="client-modal-i18n">{{ {'carousel_prev': t('carousel_prev'), 'carousel_next': t('carousel_next')} | tojson }}</script>
 <script src="{{ url_for('static', filename='js/catalog-carousel.js') }}"></script>
 <script src="{{ url_for('static', filename='js/client.js') }}"></script>
 {% endblock %}

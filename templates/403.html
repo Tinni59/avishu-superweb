@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Доступ | AVISHU{% endblock %}
+{% block title %}{{ t('forbidden_title') }}{% endblock %}
 
 {% block content %}
 <section class="av-panel">
-    <h2 class="av-h">Нет доступа</h2>
-    <p class="av-muted" style="margin-bottom: 2rem;">Этот раздел недоступен для вашей роли</p>
-    <a class="av-btn av-btn--inverse" href="{{ url_for('auth.login') }}">Ко входу</a>
+    <h2 class="av-h">{{ t('forbidden_heading') }}</h2>
+    <p class="av-muted" style="margin-bottom: 2rem;">{{ t('forbidden_lead') }}</p>
+    <a class="av-btn av-btn--inverse" href="{{ url_for('auth.login') }}">{{ t('btn_to_login') }}</a>
 </section>
 {% endblock %}

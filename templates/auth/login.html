@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Вход | AVISHU{% endblock %}
+{% block title %}{{ t('login_title') }}{% endblock %}
 
 {% block content %}
 <section class="av-auth">
-    <p class="av-kicker" style="font-size: 0.62rem; letter-spacing: 0.24em; color: #737373; margin-bottom: 1rem;">AVISHU</p>
-    <h2 class="av-h">Вход</h2>
-    <p class="av-muted" style="margin-bottom: 2rem;">Доступ к витрине, башне или цеху — по роли аккаунта</p>
+    <p class="av-kicker" style="font-size: 0.62rem; letter-spacing: 0.24em; color: #737373; margin-bottom: 1rem;">{{ t('auth_kicker') }}</p>
+    <h2 class="av-h">{{ t('auth_login_heading') }}</h2>
+    <p class="av-muted" style="margin-bottom: 2rem;">{{ t('auth_login_lead') }}</p>
 
     <form method="post" class="stack-form">
         <div class="av-field">
-            <span>Email</span>
+            <span>{{ t('field_email') }}</span>
             <input class="av-input" type="email" name="email" placeholder="" required autocomplete="email">
         </div>
         <div class="av-field">
-            <span>Пароль</span>
+            <span>{{ t('field_password') }}</span>
             <input class="av-input" type="password" name="password" placeholder="" required autocomplete="current-password">
         </div>
-        <button type="submit" class="av-btn av-btn--inverse av-btn--block">Войти</button>
+        <button type="submit" class="av-btn av-btn--inverse av-btn--block">{{ t('btn_login') }}</button>
     </form>
 
-    <p class="av-muted" style="margin-top: 2rem;"><a href="{{ url_for('auth.register') }}">Регистрация</a></p>
+    <p class="av-muted" style="margin-top: 2rem;"><a href="{{ url_for('auth.register') }}">{{ t('link_to_register') }}</a></p>
 </section>
 {% endblock %}

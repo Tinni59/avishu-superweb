@@ -11,6 +11,43 @@
         return;
     }
 
+    let I18N = {};
+    const i18nEl = document.getElementById('av-i18n-socket');
+    if (i18nEl) {
+        try {
+            I18N = JSON.parse(i18nEl.textContent);
+        } catch (e) {
+            I18N = {};
+        }
+    }
+
+    function trf(key, vars) {
+        let s = I18N[key] || '';
+        if (!vars) return s;
+        Object.keys(vars).forEach((k) => {
+            s = s.split(`{${k}}`).join(String(vars[k]));
+        });
+        return s;
+    }
+
+    function typeLabel(t) {
+        const x = t || '';
+        if (x === 'in_stock') return I18N.type_in_stock || x;
+        if (x === 'preorder') return I18N.type_preorder || x;
+        return x;
+    }
+
+    function statusLabel(code) {
+        const m = {
+            created: 'status_created',
+            accepted: 'status_accepted',
+            in_production: 'status_in_production',
+            done: 'status_done',
+        };
+        const k = m[code];
+        return k ? I18N[k] || code : code;
+    }
+
     const alertEl = document.getElementById('realtime-alert');
     const showAlert = (message) => {
         if (!alertEl) return;
@@ -119,26 +156,28 @@
         const total = parseInt(badge.textContent, 10) || 0;
         const pct = Math.min(100, total * 12 + 8);
         const fill = document.getElementById('client-loyalty-fill');
-        const pctEl = document.getElementById('client-loyalty-pct');
+        const labelEl = document.getElementById('client-loyalty-label');
+        const bar = loyaltyRoot.querySelector('.av-loyalty__bar');
+        const tpl = loyaltyRoot.dataset.loyaltyTemplate || I18N.loyalty_label_js || '';
         if (fill) fill.style.width = `${pct}%`;
-        if (pctEl) pctEl.textContent = String(pct);
+        if (labelEl && tpl) labelEl.textContent = tpl.replace('{pct}', String(pct));
+        if (bar) bar.setAttribute('aria-valuenow', String(pct));
         loyaltyRoot.setAttribute('data-order-total', String(total));
     }
 
     const FRANCHISEE_NEXT = {
         created: ['accepted'],
-        accepted: ['in_production'],
     };
 
     function franchiseeActionCell(orderId, status) {
         const next = FRANCHISEE_NEXT[status];
         if (!next || !next.length) {
-            return '<span class="av-muted">—</span>';
+            return `<span class="av-muted">${I18N.fr_no_action || '—'}</span>`;
         }
         const buttons = next
             .map(
                 (s) => {
-                    const lab = s === 'accepted' ? 'Принять' : s === 'in_production' ? 'В производство' : s;
+                    const lab = s === 'accepted' ? I18N.fr_btn_accept || s : s;
                     return `<button type="submit" name="status" value="${s}" class="av-btn av-btn--sm">${lab}</button>`;
                 }
             )
@@ -149,11 +188,10 @@
     function franchiseeActionCard(orderId, status) {
         const next = FRANCHISEE_NEXT[status];
         if (!next || !next.length) {
-            return '<span class="av-muted">—</span>';
+            return `<span class="av-muted">${I18N.fr_no_action || '—'}</span>`;
         }
         const label = (s) => {
-            if (s === 'accepted') return 'Принять';
-            if (s === 'in_production') return 'В производство';
+            if (s === 'accepted') return I18N.fr_btn_accept || String(s);
             return String(s);
         };
         const buttons = next
@@ -169,26 +207,30 @@
         const st = status || '';
         const inProgDisabled = st === 'in_production' ? ' disabled aria-disabled="true"' : '';
         const doneDisabled = st !== 'in_production' ? ' disabled aria-disabled="true"' : '';
+        const labProg = I18N.pq_btn_progress || 'В процессе';
+        const labDone = I18N.pq_btn_finish || 'Завершить';
         return `<div class="av-prod-actions">
             <form method="post" action="/production/orders/${orderId}/status" class="av-prod-actions__form">
                 <input type="hidden" name="status" value="in_production">
-                <button type="submit" class="av-btn av-btn--prod-twin"${inProgDisabled}>В процессе</button>
+                <button type="submit" class="av-btn av-btn--prod-twin"${inProgDisabled}>${labProg}</button>
             </form>
             <form method="post" action="/production/orders/${orderId}/status" class="av-prod-actions__form">
                 <input type="hidden" name="status" value="done">
-                <button type="submit" class="av-btn av-btn--prod-twin av-btn--finish"${doneDisabled}>Завершить</button>
+                <button type="submit" class="av-btn av-btn--prod-twin av-btn--finish"${doneDisabled}>${labDone}</button>
             </form>
         </div>`;
     }
 
     function productionCardHtml(order) {
+        const stLab = I18N.pq_status || 'Статус:';
+        const dueLab = I18N.pq_due || 'срок';
         return `
             <div class="av-queue__card av-queue__card--dark" data-order-id="${order.id}">
                 <div class="av-queue__card-main">
                     <p class="av-queue__id av-queue__id--muted">#${order.id}</p>
                     <p class="av-queue__title av-queue__title--light">${escapeHtml(order.product_name)}</p>
-                    <p class="av-muted av-queue__meta">${escapeHtml(order.type)} · срок ${fmtDate(order.deadline)}</p>
-                    <p class="av-queue__id av-queue__id--muted" style="margin-top:0.5rem;">Статус: <span class="js-order-status">${escapeHtml(order.status)}</span></p>
+                    <p class="av-muted av-queue__meta">${escapeHtml(typeLabel(order.type))} · ${dueLab} ${fmtDate(order.deadline)}</p>
+                    <p class="av-queue__id av-queue__id--muted" style="margin-top:0.5rem;">${stLab} <span class="js-order-status">${escapeHtml(statusLabel(order.status))}</span></p>
                 </div>
                 <div class="av-queue__actions js-production-actions">${productionActionsHtml(order.id, order.status)}</div>
             </div>`;
@@ -207,12 +249,12 @@
                 <table class="av-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Изделие</th>
-                            <th>Тип</th>
-                            <th>Статус</th>
-                            <th>Дедлайн</th>
-                            <th>Создан</th>
+                            <th>${I18N.table_id || 'ID'}</th>
+                            <th>${I18N.table_product || ''}</th>
+                            <th>${I18N.table_type || ''}</th>
+                            <th>${I18N.table_status || ''}</th>
+                            <th>${I18N.table_deadline || ''}</th>
+                            <th>${I18N.table_created || ''}</th>
                         </tr>
                     </thead>
                     <tbody id="client-orders-tbody"></tbody>
@@ -244,10 +286,10 @@
         card.innerHTML = `
             <div class="av-order-card__top">
                 <span class="av-order-card__id">#${order.id}</span>
-                <span class="av-badge status">${escapeHtml(order.status)}</span>
+                <span class="av-badge status">${escapeHtml(statusLabel(order.status))}</span>
             </div>
             <h3 class="av-order-card__title">${escapeHtml(order.product_name)}</h3>
-            <p class="av-order-card__meta">${escapeHtml(order.type)} · ${fmtDate(order.deadline)}</p>
+            <p class="av-order-card__meta">${escapeHtml(typeLabel(order.type))} · ${fmtDate(order.deadline)}</p>
             <p class="av-order-card__meta">${fmtDateTime(order.created_at)}</p>`;
     }
 
@@ -274,8 +316,8 @@
         row.innerHTML = `
             <td>#${order.id}</td>
             <td>${escapeHtml(order.product_name)}</td>
-            <td>${escapeHtml(order.type)}</td>
-            <td class="status">${escapeHtml(order.status)}</td>
+            <td>${escapeHtml(typeLabel(order.type))}</td>
+            <td class="status">${escapeHtml(statusLabel(order.status))}</td>
             <td>${fmtDate(order.deadline)}</td>
             <td>${fmtDateTime(order.created_at)}</td>`;
     }
@@ -317,14 +359,14 @@
                 <table class="av-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Клиент</th>
-                            <th>Изделие</th>
-                            <th>Тип</th>
-                            <th>Статус</th>
-                            <th>Дедлайн</th>
-                            <th>Создан</th>
-                            <th>Действие</th>
+                            <th>${I18N.table_id || 'ID'}</th>
+                            <th>${I18N.fr_table_client || ''}</th>
+                            <th>${I18N.table_product || ''}</th>
+                            <th>${I18N.table_type || ''}</th>
+                            <th>${I18N.table_status || ''}</th>
+                            <th>${I18N.table_deadline || ''}</th>
+                            <th>${I18N.table_created || ''}</th>
+                            <th>${I18N.fr_table_action || ''}</th>
                         </tr>
                     </thead>
                     <tbody id="franchisee-orders-tbody"></tbody>
@@ -412,7 +454,7 @@
                 <strong style="letter-spacing:0.08em;text-transform:uppercase;font-size:0.85rem;">#${order.id} — ${escapeHtml(order.product_name)}</strong>
                 <p class="av-muted" style="margin:0.35rem 0 0;">${escapeHtml(email)}</p>
             </div>
-            <span class="av-badge">Завершён</span>`;
+            <span class="av-badge">${I18N.pq_badge_done || 'Завершён'}</span>`;
         list.insertBefore(li, list.firstChild);
         const badge = document.querySelector('[data-production-done-count]');
         if (badge) {
@@ -460,7 +502,7 @@
         const row = document.querySelector(`tr[data-order-id="${order.id}"]`);
         if (row) {
             const cell = row.querySelector('.status, .js-order-status');
-            if (cell) cell.textContent = order.status;
+            if (cell) cell.textContent = statusLabel(order.status);
             const fa = row.querySelector('.js-franchisee-actions');
             if (fa) fa.innerHTML = franchiseeActionCell(order.id, order.status);
         }
@@ -474,22 +516,22 @@
         const card = document.querySelector(`#production-active-wrap .av-queue [data-order-id="${order.id}"]`);
         if (card) {
             const st = card.querySelector('.js-order-status');
-            if (st) st.textContent = order.status;
+            if (st) st.textContent = statusLabel(order.status);
             const pa = card.querySelector('.js-production-actions');
             if (pa) pa.innerHTML = productionActionsHtml(order.id, order.status);
         }
     }
 
     socket.on('connect', () => {
-        showAlert('Realtime: подключено (WebSocket)');
+        showAlert(I18N.js_alert_connected || '');
     });
 
     socket.on('disconnect', () => {
-        showAlert('Realtime: соединение разорвано');
+        showAlert(I18N.js_alert_disconnected || '');
     });
 
     socket.on('connect_error', () => {
-        showAlert('Realtime: ошибка подключения');
+        showAlert(I18N.js_alert_connect_error || '');
     });
 
     socket.on('order_created', (payload) => {
@@ -499,19 +541,19 @@
         if (role === 'client' && userId === order.user_id) {
             upsertClientRow(order);
             syncClientLoyaltyFromCount();
-            showAlert(`Заказ #${order.id} создан`);
+            showAlert(trf('js_alert_order_created', { id: order.id }));
             return;
         }
 
         if (role === 'franchisee') {
             upsertFranchiseeRow(order);
             bumpFranchiseeKanbanNewOrder(order);
-            showAlert(`Новый заказ #${order.id}`);
+            showAlert(trf('js_alert_new_order', { id: order.id }));
             return;
         }
 
         if (role === 'production') {
-            showAlert(`Новый заказ #${order.id} (ожидайте статус accepted)`);
+            showAlert(trf('js_alert_new_order_prod', { id: order.id }));
         }
     });
 
@@ -524,7 +566,12 @@
             upsertClientRow(order);
             updateClientTrack(order);
             syncClientLoyaltyFromCount();
-            showAlert(`Заказ #${order.id}: ${order.status}`);
+            showAlert(
+                trf('js_alert_order_status', {
+                    id: order.id,
+                    status: statusLabel(order.status),
+                })
+            );
             return;
         }
 
@@ -533,7 +580,12 @@
             if (prev) {
                 applyFranchiseeKanban(prev, order.status, order);
             }
-            showAlert(`Заказ #${order.id}: ${order.status}`);
+            showAlert(
+                trf('js_alert_order_status', {
+                    id: order.id,
+                    status: order.status,
+                })
+            );
             return;
         }
 
@@ -544,17 +596,22 @@
             if (order.status === 'done') {
                 removeProductionActiveRow(order.id);
                 appendProductionDone(order);
-                showAlert(`Заказ #${order.id} завершён`);
+                showAlert(trf('js_alert_order_done', { id: order.id }));
                 return;
             }
             if (order.status === 'accepted') {
                 upsertProductionActiveRow(order);
-                showAlert(`Заказ #${order.id} принят в производство`);
+                showAlert(trf('js_alert_order_accepted_prod', { id: order.id }));
                 return;
             }
             upsertProductionActiveRow(order);
             updateOrderRowStatus(order);
-            showAlert(`Заказ #${order.id}: ${order.status}`);
+            showAlert(
+                trf('js_alert_order_status', {
+                    id: order.id,
+                    status: statusLabel(order.status),
+                })
+            );
         }
     });
 })();

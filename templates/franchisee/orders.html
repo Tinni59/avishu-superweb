@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Заказы | AVISHU{% endblock %}
+{% block title %}{{ t('franchisee_orders_title') }}{% endblock %}
 
 {% block content %}
 <div class="av-section-head">
-    <h2>Заказы</h2>
+    <h2>{{ t('orders_page_heading') }}</h2>
     <div style="display: flex; align-items: center; gap: 1rem;">
         <span class="av-badge" data-franchisee-order-count>{{ orders|length }}</span>
-        <a class="av-muted" href="{{ url_for('franchisee.dashboard') }}">← Башня</a>
+        <a class="av-muted" href="{{ url_for('franchisee.dashboard') }}">{{ t('fr_orders_back') }}</a>
     </div>
 </div>
 
@@ -29,12 +29,12 @@
                 <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
                     {% for s in allowed %}
                     <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--accept av-btn--inverse av-btn--block">
-                        {% if s == 'accepted' %}Принять{% elif s == 'in_production' %}В производство{% else %}{{ s }}{% endif %}
+                        {% if s == 'accepted' %}{{ t('fr_btn_accept') }}{% else %}{{ s }}{% endif %}
                     </button>
                     {% endfor %}
                 </form>
                 {% else %}
-                <span class="av-muted">—</span>
+                <span class="av-muted">{{ t('fr_no_action') }}</span>
                 {% endif %}
             </div>
         </article>
@@ -45,14 +45,14 @@
         <table class="av-table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Клиент</th>
-                    <th>Изделие</th>
-                    <th>Тип</th>
-                    <th>Статус</th>
-                    <th>Дедлайн</th>
-                    <th>Создан</th>
-                    <th>Действие</th>
+                    <th>{{ t('table_id') }}</th>
+                    <th>{{ t('fr_table_client') }}</th>
+                    <th>{{ t('table_product') }}</th>
+                    <th>{{ t('table_type') }}</th>
+                    <th>{{ t('table_status') }}</th>
+                    <th>{{ t('table_deadline') }}</th>
+                    <th>{{ t('table_created') }}</th>
+                    <th>{{ t('fr_table_action') }}</th>
                 </tr>
             </thead>
             <tbody id="franchisee-orders-tbody">
@@ -70,11 +70,11 @@
                         {% if allowed %}
                         <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
                             {% for s in allowed %}
-                            <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--sm">{% if s == 'accepted' %}Принять{% elif s == 'in_production' %}В производство{% else %}{{ s }}{% endif %}</button>
+                            <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--sm">{% if s == 'accepted' %}{{ t('fr_btn_accept') }}{% else %}{{ s }}{% endif %}</button>
                             {% endfor %}
                         </form>
                         {% else %}
-                        <span class="av-muted">—</span>
+                        <span class="av-muted">{{ t('fr_no_action') }}</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -83,7 +83,7 @@
         </table>
     </div>
 {% else %}
-    <p class="empty-state av-muted">Заказов пока нет.</p>
+    <p class="empty-state av-muted">{{ t('fr_orders_empty') }}</p>
 {% endif %}
 </div>
 {% endblock %}

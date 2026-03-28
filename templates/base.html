@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ html_lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>{% block title %}AVISHU{% endblock %}</title>
+    <title>{% block title %}{{ t('meta_title_default') }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adaptive.css') }}">
 </head>
@@ -18,30 +18,31 @@
         <div class="av-shell av-header__inner">
             <a class="av-logo" href="{% if current_user.is_authenticated %}{% if current_user.role == 'client' %}{{ url_for('client.dashboard') }}{% elif current_user.role == 'franchisee' %}{{ url_for('franchisee.dashboard') }}{% elif current_user.role == 'production' %}{{ url_for('production.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}{% else %}{{ url_for('auth.login') }}{% endif %}">AVISHU</a>
 
-            <nav class="av-nav av-nav--header" aria-label="Основная навигация">
+            <nav class="av-nav av-nav--header" aria-label="{{ t('aria_main_nav') }}">
                 {% if current_user.is_authenticated %}
                     {% if current_user.role == 'client' %}
-                        <a href="{{ url_for('client.dashboard') }}">Витрина</a>
-                        <a href="{{ url_for('client.cart') }}">Корзина{% if cart_count %} ({{ cart_count }}){% endif %}</a>
-                        <a href="{{ url_for('client.orders') }}">Заказы</a>
+                        <a href="{{ url_for('client.dashboard') }}">{{ t('nav_showcase') }}</a>
+                        <a href="{{ url_for('client.cart') }}">{{ t('nav_cart') }}{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+                        <a href="{{ url_for('client.orders') }}">{{ t('nav_orders') }}</a>
                     {% elif current_user.role == 'franchisee' %}
-                        <a href="{{ url_for('franchisee.dashboard') }}">Башня</a>
-                        <a href="{{ url_for('franchisee.orders') }}">Заказы</a>
+                        <a href="{{ url_for('franchisee.dashboard') }}">{{ t('nav_tower') }}</a>
+                        <a href="{{ url_for('franchisee.orders') }}">{{ t('nav_orders') }}</a>
                     {% elif current_user.role == 'production' %}
-                        <a href="{{ url_for('production.dashboard') }}">Цех</a>
-                        <a href="{{ url_for('production.orders') }}">Очередь</a>
+                        <a href="{{ url_for('production.dashboard') }}">{{ t('nav_workshop') }}</a>
+                        <a href="{{ url_for('production.orders') }}">{{ t('nav_queue') }}</a>
                     {% endif %}
                     <span class="av-user">{{ current_user.email }}</span>
-                    <a href="{{ url_for('auth.logout') }}">Выход</a>
+                    <a href="{{ url_for('auth.logout') }}">{{ t('nav_logout') }}</a>
                 {% else %}
-                    <a href="{{ url_for('auth.login') }}">Вход</a>
-                    <a href="{{ url_for('auth.register') }}">Регистрация</a>
+                    <a href="{{ url_for('auth.login') }}">{{ t('nav_login') }}</a>
+                    <a href="{{ url_for('auth.register') }}">{{ t('nav_register') }}</a>
                 {% endif %}
             </nav>
 
             <div class="av-header__tools">
-                <a class="av-theme-toggle" href="{{ url_for('theme.set_theme', mode='dark' if theme_mode == 'light' else 'light') }}" title="Тема: {{ 'светлая' if theme_mode == 'light' else 'тёмная' }}">{{ 'Тёмная' if theme_mode == 'light' else 'Светлая' }}</a>
-            <button type="button" class="av-nav-toggle" id="av-nav-toggle" aria-expanded="false" aria-controls="av-drawer" aria-label="Меню">
+                <a class="av-theme-toggle" href="{{ url_for('locale.set_locale', code=next_lang) }}" title="{% if next_lang == 'kk' %}{{ t('lang_title_kk') }}{% else %}{{ t('lang_title_ru') }}{% endif %}">{% if next_lang == 'kk' %}{{ t('lang_to_kk') }}{% else %}{{ t('lang_to_ru') }}{% endif %}</a>
+                <a class="av-theme-toggle" href="{{ url_for('theme.set_theme', mode='dark' if theme_mode == 'light' else 'light') }}" title="{% if theme_mode == 'light' %}{{ t('theme_title_light') }}{% else %}{{ t('theme_title_dark') }}{% endif %}">{% if theme_mode == 'light' %}{{ t('theme_to_dark') }}{% else %}{{ t('theme_to_light') }}{% endif %}</a>
+            <button type="button" class="av-nav-toggle" id="av-nav-toggle" aria-expanded="false" aria-controls="av-drawer" aria-label="{{ t('aria_menu') }}">
                 <span class="av-nav-toggle__lines" aria-hidden="true">
                     <span></span><span></span><span></span>
                 </span>
@@ -52,47 +53,50 @@
 
     <div class="av-drawer" id="av-drawer" aria-hidden="true">
         <div class="av-drawer__backdrop" data-drawer-close></div>
-        <div class="av-drawer__panel" role="dialog" aria-modal="true" aria-label="Меню">
+        <div class="av-drawer__panel" role="dialog" aria-modal="true" aria-label="{{ t('aria_menu') }}">
             <div class="av-drawer__head">
-                <span class="av-h" style="font-size: 0.72rem; margin: 0;">Меню</span>
-                <button type="button" class="av-drawer__close" data-drawer-close aria-label="Закрыть">×</button>
+                <span class="av-h" style="font-size: 0.72rem; margin: 0;">{{ t('drawer_menu') }}</span>
+                <button type="button" class="av-drawer__close" data-drawer-close aria-label="{{ t('drawer_close') }}">×</button>
             </div>
-            <p style="margin: 0 0 1rem;"><a class="av-theme-toggle" href="{{ url_for('theme.set_theme', mode='dark' if theme_mode == 'light' else 'light') }}">{{ 'Тёмная тема' if theme_mode == 'light' else 'Светлая тема' }}</a></p>
+            <p style="margin: 0 0 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <a class="av-theme-toggle" href="{{ url_for('locale.set_locale', code=next_lang) }}">{% if next_lang == 'kk' %}{{ t('lang_to_kk') }}{% else %}{{ t('lang_to_ru') }}{% endif %}</a>
+                <a class="av-theme-toggle" href="{{ url_for('theme.set_theme', mode='dark' if theme_mode == 'light' else 'light') }}">{% if theme_mode == 'light' %}{{ t('theme_drawer_dark') }}{% else %}{{ t('theme_drawer_light') }}{% endif %}</a>
+            </p>
             <nav class="av-drawer__links">
                 {% if current_user.is_authenticated %}
                     {% if current_user.role == 'client' %}
-                        <a href="{{ url_for('client.dashboard') }}">Витрина</a>
-                        <a href="{{ url_for('client.cart') }}">Корзина{% if cart_count %} ({{ cart_count }}){% endif %}</a>
-                        <a href="{{ url_for('client.orders') }}">Заказы</a>
+                        <a href="{{ url_for('client.dashboard') }}">{{ t('nav_showcase') }}</a>
+                        <a href="{{ url_for('client.cart') }}">{{ t('nav_cart') }}{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+                        <a href="{{ url_for('client.orders') }}">{{ t('nav_orders') }}</a>
                     {% elif current_user.role == 'franchisee' %}
-                        <a href="{{ url_for('franchisee.dashboard') }}">Башня</a>
-                        <a href="{{ url_for('franchisee.orders') }}">Заказы</a>
+                        <a href="{{ url_for('franchisee.dashboard') }}">{{ t('nav_tower') }}</a>
+                        <a href="{{ url_for('franchisee.orders') }}">{{ t('nav_orders') }}</a>
                     {% elif current_user.role == 'production' %}
-                        <a href="{{ url_for('production.dashboard') }}">Цех</a>
-                        <a href="{{ url_for('production.orders') }}">Очередь</a>
+                        <a href="{{ url_for('production.dashboard') }}">{{ t('nav_workshop') }}</a>
+                        <a href="{{ url_for('production.orders') }}">{{ t('nav_queue') }}</a>
                     {% endif %}
-                    <a href="{{ url_for('auth.logout') }}">Выход</a>
+                    <a href="{{ url_for('auth.logout') }}">{{ t('nav_logout') }}</a>
                     <p class="av-drawer__meta">{{ current_user.email }}</p>
                 {% else %}
-                    <a href="{{ url_for('auth.login') }}">Вход</a>
-                    <a href="{{ url_for('auth.register') }}">Регистрация</a>
+                    <a href="{{ url_for('auth.login') }}">{{ t('nav_login') }}</a>
+                    <a href="{{ url_for('auth.register') }}">{{ t('nav_register') }}</a>
                 {% endif %}
             </nav>
         </div>
     </div>
 
     {% if current_user.is_authenticated %}
-    <nav class="av-bottom-nav" aria-label="Быстрая навигация">
+    <nav class="av-bottom-nav" aria-label="{{ t('aria_bottom_nav') }}">
         {% if current_user.role == 'client' %}
-            <a href="{{ url_for('client.dashboard') }}" {% if ep == 'client.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Витрина</a>
-            <a href="{{ url_for('client.cart') }}" {% if ep == 'client.cart' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Корзина</a>
-            <a href="{{ url_for('client.orders') }}" {% if ep == 'client.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Заказы</a>
+            <a href="{{ url_for('client.dashboard') }}" {% if ep == 'client.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_showcase') }}</a>
+            <a href="{{ url_for('client.cart') }}" {% if ep == 'client.cart' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_cart') }}</a>
+            <a href="{{ url_for('client.orders') }}" {% if ep == 'client.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_orders') }}</a>
         {% elif current_user.role == 'franchisee' %}
-            <a href="{{ url_for('franchisee.dashboard') }}" {% if ep == 'franchisee.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Башня</a>
-            <a href="{{ url_for('franchisee.orders') }}" {% if ep == 'franchisee.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Заказы</a>
+            <a href="{{ url_for('franchisee.dashboard') }}" {% if ep == 'franchisee.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_tower') }}</a>
+            <a href="{{ url_for('franchisee.orders') }}" {% if ep == 'franchisee.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_orders') }}</a>
         {% elif current_user.role == 'production' %}
-            <a href="{{ url_for('production.dashboard') }}" {% if ep == 'production.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Цех</a>
-            <a href="{{ url_for('production.orders') }}" {% if ep == 'production.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Очередь</a>
+            <a href="{{ url_for('production.dashboard') }}" {% if ep == 'production.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_workshop') }}</a>
+            <a href="{{ url_for('production.orders') }}" {% if ep == 'production.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>{{ t('nav_queue') }}</a>
         {% endif %}
     </nav>
     {% endif %}
@@ -113,6 +117,7 @@
         {% block content %}{% endblock %}
     </main>
 
+    <script type="application/json" id="av-i18n-socket">{{ js_i18n | safe }}</script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
