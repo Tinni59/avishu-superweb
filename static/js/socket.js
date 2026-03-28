@@ -1,6 +1,6 @@
 /**
  * Flask-SocketIO: order_created / order_updated — обновление DOM без reload.
- * Транспорт: только WebSocket (без polling).
+ * Сначала polling, затем upgrade на WebSocket (так надёжнее с Flask-SocketIO + threading).
  */
 (function () {
     const body = document.body;
@@ -21,8 +21,12 @@
     };
 
     const socket = io({
-        transports: ['websocket'],
-        upgrade: false,
+        path: '/socket.io',
+        transports: ['polling', 'websocket'],
+        upgrade: true,
+        reconnection: true,
+        reconnectionAttempts: 8,
+        reconnectionDelay: 1000,
     });
 
     const fmtDate = (iso) => {

@@ -6,4 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-socketio = SocketIO(async_mode="threading")
+# simple-websocket нужен для нормального WebSocket в async_mode=threading (см. requirements.txt)
+socketio = SocketIO(
+    async_mode="threading",
+    cors_allowed_origins="*",
+)
