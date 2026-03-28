@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from flask_login import UserMixin
@@ -42,3 +43,37 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"<Order #{self.id} {self.product_name}>"
+
+
+class CatalogProduct(db.Model):
+    """Товары витрины (опционально; иначе каталог строится из static/images/catalog)."""
+
+    __tablename__ = "catalog_product"
+
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    name = db.Column(db.String(255), nullable=False)
+    line = db.Column(db.String(128), nullable=False, default="Коллекция")
+    product_type = db.Column(db.String(32), nullable=False, default="in_stock")
+    price = db.Column(db.String(64), nullable=False, default="—")
+    detail = db.Column(db.Text, nullable=True)
+    sort_order = db.Column(db.Integer, nullable=False, default=0)
+    images_json = db.Column(db.Text, nullable=False, default="[]")
+
+    def to_catalog_dict(self):
+        try:
+            images = json.loads(self.images_json or "[]")
+        except (json.JSONDecodeError, TypeError):
+            images = []
+        return {
+            "id": self.slug,
+            "name": self.name,
+            "line": self.line,
+            "type": self.product_type,
+            "price": self.price,
+            "detail": self.detail or "",
+            "images": images,
+        }
+
+    def __repr__(self):
+        return f"<CatalogProduct {self.name}>"

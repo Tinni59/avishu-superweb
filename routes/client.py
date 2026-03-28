@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 
+from catalog import get_catalog
 from extensions import db
 from models import Order
 from order_events import emit_order_created
@@ -10,42 +11,6 @@ from order_status import ORDER_TYPES, validate_new_order
 from routes.helpers import role_required
 
 client_bp = Blueprint("client", __name__, url_prefix="/client")
-
-# Витрина: демо-каталог (без отдельной БД товаров)
-CATALOG = [
-    {
-        "id": "av-fw25-coat",
-        "name": "Atelier Wool Coat",
-        "line": "FW25",
-        "type": "in_stock",
-        "price": "48 000 ₽",
-        "detail": "Пальто из итальянской шерсти. Ограниченная партия.",
-    },
-    {
-        "id": "av-capsule-silk",
-        "name": "Silk Capsule Set",
-        "line": "Capsule",
-        "type": "preorder",
-        "price": "от 32 000 ₽",
-        "detail": "Шёлковый комплект на заказ. Срок — по календарю готовности.",
-    },
-    {
-        "id": "av-leather-tote",
-        "name": "Brutal Tote",
-        "line": "Objects",
-        "type": "in_stock",
-        "price": "22 000 ₽",
-        "detail": "Кожа растительного дубления. Ручная работа.",
-    },
-    {
-        "id": "av-mono-dress",
-        "name": "Mono Column Dress",
-        "line": "Runway",
-        "type": "preorder",
-        "price": "от 41 000 ₽",
-        "detail": "Предзаказ коллекции. Укажите желаемую дату готовности.",
-    },
-]
 
 
 def _parse_deadline_form(raw: str):
@@ -84,7 +49,7 @@ def _create_order_for_user(product_name: str, order_type: str, deadline):
 @login_required
 @role_required("client")
 def dashboard():
-    return render_template("client/dashboard.html", catalog=CATALOG)
+    return render_template("client/dashboard.html", catalog=get_catalog())
 
 
 @client_bp.route("/products")

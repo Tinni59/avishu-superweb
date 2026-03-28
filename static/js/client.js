@@ -1,5 +1,5 @@
 /**
- * Витрина: модальное окно товара (AVISHU)
+ * Витрина: модальное окно товара (AVISHU) + карусель в модалке
  */
 (function () {
     const raw = document.getElementById('catalog-json');
@@ -13,6 +13,7 @@
     }
 
     const modal = document.getElementById('product-modal');
+    const carouselHost = document.getElementById('modal-carousel-host');
     const titleEl = document.getElementById('modal-title');
     const priceEl = document.getElementById('modal-price');
     const detailEl = document.getElementById('modal-detail');
@@ -28,8 +29,47 @@
         return catalog.find((p) => p.id === id);
     }
 
+    function escapeAttr(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;');
+    }
+
+    function buildCarouselHtml(product) {
+        const imgs = product.images || [];
+        if (!imgs.length) return '';
+        const multi = imgs.length > 1;
+        const slideHtml = imgs
+            .map(
+                (src) =>
+                    `<div class="av-carousel__slide"><img src="${escapeAttr(src)}" alt="${escapeAttr(product.name)}" loading="lazy" decoding="async"></div>`
+            )
+            .join('');
+        const multiClass = multi ? ' av-carousel--has-multiple' : '';
+        const arrows = multi
+            ? `
+                <button type="button" class="av-carousel__arrow av-carousel__arrow--prev" aria-label="Предыдущее фото">‹</button>
+                <button type="button" class="av-carousel__arrow av-carousel__arrow--next" aria-label="Следующее фото">›</button>
+                <div class="av-carousel__dots" aria-hidden="true"></div>`
+            : '';
+        return `<div class="av-carousel${multiClass}" data-carousel>
+            <div class="av-carousel__viewport">
+                <div class="av-carousel__track">${slideHtml}</div>
+            </div>${arrows}
+        </div>`;
+    }
+
     function openModal(product) {
         if (!modal || !product) return;
+        if (carouselHost) {
+            carouselHost.innerHTML = buildCarouselHtml(product);
+            if (typeof window.AVISHU_initCarousel === 'function') {
+                const c = carouselHost.querySelector('.av-carousel');
+                if (c) window.AVISHU_initCarousel(c);
+            }
+        }
+
         titleEl.textContent = product.name;
         priceEl.textContent = product.price;
         detailEl.textContent = product.detail;
@@ -66,6 +106,7 @@
         if (!modal) return;
         modal.hidden = true;
         document.body.style.overflow = '';
+        if (carouselHost) carouselHost.innerHTML = '';
     }
 
     document.querySelectorAll('[data-open-modal]').forEach((btn) => {

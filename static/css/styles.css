@@ -503,15 +503,128 @@ a:hover {
 .av-product {
     background: var(--white);
     border: var(--border);
-    padding: 2rem 1.75rem;
+    padding: 0;
     display: flex;
     flex-direction: column;
     min-height: 280px;
     transition: background 0.25s var(--ease);
+    overflow: hidden;
 }
 
 .av-product:hover {
     background: var(--gray-100);
+}
+
+.av-product__body {
+    padding: 1.75rem 1.75rem 2rem;
+}
+
+/* Карусель в карточке и в модалке */
+.av-carousel {
+    position: relative;
+    width: 100%;
+    --av-slide-ms: 380ms;
+}
+
+.av-carousel__viewport {
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background: var(--gray-100);
+    touch-action: pan-y;
+}
+
+.av-carousel__track {
+    display: flex;
+    height: 100%;
+    transition: transform var(--av-slide-ms) cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: transform;
+}
+
+.av-carousel__slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+}
+
+.av-carousel__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.av-carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border: var(--border);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--black);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.av-carousel__arrow:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+.av-carousel__arrow--prev {
+    left: 0.5rem;
+}
+
+.av-carousel__arrow--next {
+    right: 0.5rem;
+}
+
+@media (min-width: 1024px) {
+    .av-carousel--has-multiple .av-carousel__arrow {
+        display: flex;
+    }
+}
+
+.av-carousel__dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0 0.25rem;
+}
+
+.av-carousel__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1px solid var(--black);
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.35;
+    transition: opacity 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.av-carousel__dot.is-active {
+    opacity: 1;
+    background: var(--black);
+}
+
+.av-modal__carousel {
+    margin: 0 -0.25rem 1.25rem;
+}
+
+@media (min-width: 1024px) {
+    .av-modal__carousel {
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
 .av-product__line {

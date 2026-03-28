@@ -299,13 +299,6 @@ body.av-has-bottom-nav {
     opacity: 0.92;
 }
 
-.av-product__visual {
-    aspect-ratio: 3 / 4;
-    width: 100%;
-    background: var(--gray-100);
-    border-bottom: var(--hairline);
-}
-
 .av-product__body {
     padding: var(--av-space-lg);
     display: flex;
@@ -352,6 +345,10 @@ body.av-has-bottom-nav {
 
 .av-modal__title {
     margin-top: 2.5rem;
+}
+
+#modal-carousel-host:not(:empty) ~ #modal-title {
+    margin-top: 1rem;
 }
 
 .av-modal__actions {
