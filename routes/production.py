@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from extensions import db
 from models import Order
 from order_events import emit_order_updated
-from order_status import is_valid_production_transition, next_statuses_for_production
+from order_status import is_valid_production_transition
 from routes.helpers import role_required
 
 production_bp = Blueprint("production", __name__, url_prefix="/production")
@@ -36,7 +36,6 @@ def orders():
         "production/orders.html",
         visible_orders=visible,
         completed_orders=done_list,
-        next_statuses_for_production=next_statuses_for_production,
     )
 
 

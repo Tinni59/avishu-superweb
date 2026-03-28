@@ -1080,6 +1080,61 @@ body.av-theme-dark .av-queue__meta {
     gap: 0.75rem;
 }
 
+/* Цех: две кнопки в ряд, не выходят за карточку */
+.av-queue__card-main {
+    min-width: 0;
+}
+
+.av-queue__actions {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.av-prod-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.av-prod-actions__form {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.av-btn--prod-twin {
+    width: 100%;
+    min-width: 0;
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+    font-size: 0.62rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.av-btn:disabled,
+.av-btn[disabled] {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+@media (min-width: 720px) {
+    .av-queue__card {
+        overflow: hidden;
+    }
+
+    .av-queue__actions {
+        align-self: stretch;
+        max-width: min(100%, 340px);
+    }
+}
+
 .av-prod-stats {
     display: grid;
     grid-template-columns: 1fr;
@@ -1156,7 +1211,7 @@ body.av-theme-dark .av-queue__meta {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    min-width: min(280px, 100%);
+    min-width: 0;
 }
 
 .av-done-list {

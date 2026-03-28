@@ -17,24 +17,24 @@
 {% if visible_orders %}
     <div class="av-queue av-queue--cards" id="production-active-queue">
         {% for order in visible_orders %}
-        {% set allowed = next_statuses_for_production(order.status) %}
         <div class="av-queue__card av-queue__card--dark" data-order-id="{{ order.id }}">
-            <div>
+            <div class="av-queue__card-main">
                 <p class="av-queue__id av-queue__id--muted">#{{ order.id }}</p>
                 <p class="av-queue__title av-queue__title--light">{{ order.product_name }}</p>
                 <p class="av-muted av-queue__meta">{{ order.type }} · срок {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
                 <p class="av-queue__id av-queue__id--muted" style="margin-top: 0.5rem;">Статус: <span class="js-order-status">{{ order.status }}</span></p>
             </div>
             <div class="av-queue__actions js-production-actions">
-                {% if allowed %}
-                <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form av-queue__form-btns">
-                    {% for s in allowed %}
-                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--xl {% if s == 'done' %}av-btn--finish{% endif %}">
-                        {% if s == 'in_production' %}В процессе{% elif s == 'done' %}Завершить{% else %}{{ s }}{% endif %}
-                    </button>
-                    {% endfor %}
-                </form>
-                {% endif %}
+                <div class="av-prod-actions">
+                    <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="av-prod-actions__form">
+                        <input type="hidden" name="status" value="in_production">
+                        <button type="submit" class="av-btn av-btn--prod-twin" {% if order.status == 'in_production' %}disabled aria-disabled="true"{% endif %}>В процессе</button>
+                    </form>
+                    <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="av-prod-actions__form">
+                        <input type="hidden" name="status" value="done">
+                        <button type="submit" class="av-btn av-btn--prod-twin av-btn--finish" {% if order.status != 'in_production' %}disabled aria-disabled="true"{% endif %}>Завершить</button>
+                    </form>
+                </div>
             </div>
         </div>
         {% endfor %}

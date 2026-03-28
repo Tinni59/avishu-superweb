@@ -130,11 +130,6 @@
         accepted: ['in_production'],
     };
 
-    const PRODUCTION_NEXT = {
-        accepted: ['in_production', 'done'],
-        in_production: ['done'],
-    };
-
     function franchiseeActionCell(orderId, status) {
         const next = FRANCHISEE_NEXT[status];
         if (!next || !next.length) {
@@ -170,37 +165,32 @@
         return `<form method="post" action="/franchisee/orders/${orderId}/status" class="inline-form">${buttons}</form>`;
     }
 
-    function productionActionCell(orderId, status) {
-        const next = PRODUCTION_NEXT[status];
-        if (!next || !next.length) {
-            return '<span class="av-muted">—</span>';
-        }
-        const btnLabel = (s) => {
-            if (s === 'in_production') return 'В процессе';
-            if (s === 'done') return 'Завершить';
-            return s;
-        };
-        const btnClass = (s) =>
-            s === 'done' ? 'av-btn av-btn--xl av-btn--finish' : 'av-btn av-btn--xl';
-        const buttons = next
-            .map(
-                (s) =>
-                    `<button type="submit" name="status" value="${s}" class="${btnClass(s)}">${btnLabel(s)}</button>`
-            )
-            .join('');
-        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form av-queue__form-btns">${buttons}</form>`;
+    function productionActionsHtml(orderId, status) {
+        const st = status || '';
+        const inProgDisabled = st === 'in_production' ? ' disabled aria-disabled="true"' : '';
+        const doneDisabled = st !== 'in_production' ? ' disabled aria-disabled="true"' : '';
+        return `<div class="av-prod-actions">
+            <form method="post" action="/production/orders/${orderId}/status" class="av-prod-actions__form">
+                <input type="hidden" name="status" value="in_production">
+                <button type="submit" class="av-btn av-btn--prod-twin"${inProgDisabled}>В процессе</button>
+            </form>
+            <form method="post" action="/production/orders/${orderId}/status" class="av-prod-actions__form">
+                <input type="hidden" name="status" value="done">
+                <button type="submit" class="av-btn av-btn--prod-twin av-btn--finish"${doneDisabled}>Завершить</button>
+            </form>
+        </div>`;
     }
 
     function productionCardHtml(order) {
         return `
             <div class="av-queue__card av-queue__card--dark" data-order-id="${order.id}">
-                <div>
+                <div class="av-queue__card-main">
                     <p class="av-queue__id av-queue__id--muted">#${order.id}</p>
                     <p class="av-queue__title av-queue__title--light">${escapeHtml(order.product_name)}</p>
                     <p class="av-muted av-queue__meta">${escapeHtml(order.type)} · срок ${fmtDate(order.deadline)}</p>
                     <p class="av-queue__id av-queue__id--muted" style="margin-top:0.5rem;">Статус: <span class="js-order-status">${escapeHtml(order.status)}</span></p>
                 </div>
-                <div class="av-queue__actions js-production-actions">${productionActionCell(order.id, order.status)}</div>
+                <div class="av-queue__actions js-production-actions">${productionActionsHtml(order.id, order.status)}</div>
             </div>`;
     }
 
@@ -486,7 +476,7 @@
             const st = card.querySelector('.js-order-status');
             if (st) st.textContent = order.status;
             const pa = card.querySelector('.js-production-actions');
-            if (pa) pa.innerHTML = productionActionCell(order.id, order.status);
+            if (pa) pa.innerHTML = productionActionsHtml(order.id, order.status);
         }
     }
 
