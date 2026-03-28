@@ -53,7 +53,7 @@
     };
 
     const PRODUCTION_NEXT = {
-        accepted: ['done'],
+        accepted: ['in_production', 'done'],
         in_production: ['done'],
     };
 
@@ -64,8 +64,10 @@
         }
         const buttons = next
             .map(
-                (s) =>
-                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--sm">${s}</button>`
+                (s) => {
+                    const lab = s === 'accepted' ? 'Принять' : s === 'in_production' ? 'В производство' : s;
+                    return `<button type="submit" name="status" value="${s}" class="av-btn av-btn--sm">${lab}</button>`;
+                }
             )
             .join('');
         return `<form method="post" action="/franchisee/orders/${orderId}/status" class="inline-form">${buttons}</form>`;
@@ -77,9 +79,9 @@
             return '<span class="av-muted">—</span>';
         }
         const label = (s) => {
-            if (s === 'accepted') return 'ACCEPT';
-            if (s === 'in_production') return 'IN PRODUCTION';
-            return String(s).toUpperCase();
+            if (s === 'accepted') return 'Принять';
+            if (s === 'in_production') return 'В производство';
+            return String(s);
         };
         const buttons = next
             .map(
@@ -95,13 +97,22 @@
         if (!next || !next.length) {
             return '<span class="av-muted">—</span>';
         }
+        const btnLabel = (s) => {
+            if (s === 'in_production') return 'В процессе';
+            if (s === 'done') return 'Завершить';
+            return s;
+        };
+        const btnClass = (s) =>
+            s === 'done'
+                ? 'av-btn av-btn--xl av-btn--inverse av-btn--finish'
+                : 'av-btn av-btn--xl av-btn--inverse';
         const buttons = next
             .map(
                 (s) =>
-                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--xl av-btn--inverse av-btn--finish" style="background:#fff;color:#000;border-color:#fff;">ЗАВЕРШИТЬ</button>`
+                    `<button type="submit" name="status" value="${s}" class="${btnClass(s)}" style="background:#fff;color:#000;border-color:#fff;">${btnLabel(s)}</button>`
             )
             .join('');
-        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form" style="flex-direction:column;width:100%;">${buttons}</form>`;
+        return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form" style="flex-direction:column;width:100%;gap:0.75rem;">${buttons}</form>`;
     }
 
     function productionCardHtml(order) {

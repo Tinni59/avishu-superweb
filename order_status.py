@@ -9,9 +9,9 @@ _FRANCHISEE_EDGES = {
     "accepted": frozenset({"in_production"}),
 }
 
-# Производство: только accepted / in_production → done
+# Производство: accepted → в работе (in_production) или сразу done; in_production → done
 _PRODUCTION_EDGES = {
-    "accepted": frozenset({"done"}),
+    "accepted": frozenset({"in_production", "done"}),
     "in_production": frozenset({"done"}),
 }
 

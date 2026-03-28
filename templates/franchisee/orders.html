@@ -29,7 +29,7 @@
                 <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
                     {% for s in allowed %}
                     <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--accept av-btn--inverse av-btn--block">
-                        {% if s == 'accepted' %}ACCEPT{% elif s == 'in_production' %}IN PRODUCTION{% else %}{{ s|upper }}{% endif %}
+                        {% if s == 'accepted' %}Принять{% elif s == 'in_production' %}В производство{% else %}{{ s }}{% endif %}
                     </button>
                     {% endfor %}
                 </form>
@@ -70,7 +70,7 @@
                         {% if allowed %}
                         <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
                             {% for s in allowed %}
-                            <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--sm">{{ s }}</button>
+                            <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--sm">{% if s == 'accepted' %}Принять{% elif s == 'in_production' %}В производство{% else %}{{ s }}{% endif %}</button>
                             {% endfor %}
                         </form>
                         {% else %}

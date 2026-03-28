@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from extensions import db
 from models import Order
@@ -14,7 +14,12 @@ production_bp = Blueprint("production", __name__, url_prefix="/production")
 @login_required
 @role_required("production")
 def dashboard():
-    return render_template("production/dashboard.html")
+    counts = {
+        "requested": Order.query.filter_by(status="accepted").count(),
+        "in_progress": Order.query.filter_by(status="in_production").count(),
+        "completed": Order.query.filter_by(status="done").count(),
+    }
+    return render_template("production/dashboard.html", stats=counts)
 
 
 @production_bp.route("/orders")

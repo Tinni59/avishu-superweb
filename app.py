@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from flask_socketio import emit, join_room
 from extensions import db, login_manager, socketio
@@ -34,6 +34,7 @@ def create_app(test_config=None):
     from routes.franchisee import franchisee_bp
     from routes.production import production_bp
     from routes.orders_api import orders_api_bp
+    from routes.theme import theme_bp
     from routes.helpers import redirect_for_role
 
     @login_manager.user_loader
@@ -60,6 +61,17 @@ def create_app(test_config=None):
         n = len(cart) if isinstance(cart, list) else 0
         return {"cart_count": n}
 
+    @app.context_processor
+    def theme_context():
+        t = request.cookies.get("av_theme", "light")
+        if t not in ("light", "dark"):
+            t = "light"
+        return {
+            "theme_mode": t,
+            "body_theme_class": "av-theme-dark" if t == "dark" else "",
+        }
+
+    app.register_blueprint(theme_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(client_bp)
     app.register_blueprint(franchisee_bp)

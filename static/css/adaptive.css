@@ -555,6 +555,24 @@ body.av-has-bottom-nav {
     background: #1a1a1a;
 }
 
+.av-theme-dark .av-theme-toggle {
+    border-color: #333;
+    color: #e5e5e5;
+}
+
+.av-theme-dark .av-theme-toggle:hover {
+    background: #1a1a1a;
+}
+
+.av-theme-dark .av-prod-stat {
+    background: #0a0a0a;
+    border: 1px solid #333;
+}
+
+.av-theme-dark .av-prod-stat__val {
+    color: var(--white);
+}
+
 /* ——— Tablet 768px ——— */
 @media (min-width: 768px) {
     :root {

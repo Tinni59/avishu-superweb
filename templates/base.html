@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adaptive.css') }}">
 </head>
 <body
-    class="{% block body_class %}{% endblock %}{% if current_user.is_authenticated %} av-has-bottom-nav{% endif %}"
+    class="{% block body_class %}{% endblock %} {{ body_theme_class }}{% if current_user.is_authenticated %} av-has-bottom-nav{% endif %}"
     data-user-role="{{ current_user.role if current_user.is_authenticated else '' }}"
     data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}"
 >
@@ -39,11 +39,14 @@
                 {% endif %}
             </nav>
 
+            <div class="av-header__tools">
+                <a class="av-theme-toggle" href="{{ url_for('theme.set_theme', mode='dark' if theme_mode == 'light' else 'light') }}" title="Тема: {{ 'светлая' if theme_mode == 'light' else 'тёмная' }}">{{ 'Тёмная' if theme_mode == 'light' else 'Светлая' }}</a>
             <button type="button" class="av-nav-toggle" id="av-nav-toggle" aria-expanded="false" aria-controls="av-drawer" aria-label="Меню">
                 <span class="av-nav-toggle__lines" aria-hidden="true">
                     <span></span><span></span><span></span>
                 </span>
             </button>
+            </div>
         </div>
     </header>
 
@@ -54,6 +57,7 @@
                 <span class="av-h" style="font-size: 0.72rem; margin: 0;">Меню</span>
                 <button type="button" class="av-drawer__close" data-drawer-close aria-label="Закрыть">×</button>
             </div>
+            <p style="margin: 0 0 1rem;"><a class="av-theme-toggle" href="{{ url_for('theme.set_theme', mode='dark' if theme_mode == 'light' else 'light') }}">{{ 'Тёмная тема' if theme_mode == 'light' else 'Светлая тема' }}</a></p>
             <nav class="av-drawer__links">
                 {% if current_user.is_authenticated %}
                     {% if current_user.role == 'client' %}
