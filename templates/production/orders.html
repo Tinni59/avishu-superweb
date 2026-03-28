@@ -31,7 +31,7 @@
                 {% if allowed %}
                 <form method="post" action="{{ url_for('production.update_status', order_id=order.id) }}" class="inline-form" style="flex-direction: column; width: 100%;">
                     {% for s in allowed %}
-                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--xl av-btn--inverse" style="background: #fff; color: #000; border-color: #fff;">Завершить: {{ s }}</button>
+                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--xl av-btn--inverse av-btn--finish" style="background: #fff; color: #000; border-color: #fff;">ЗАВЕРШИТЬ</button>
                     {% endfor %}
                 </form>
                 {% endif %}

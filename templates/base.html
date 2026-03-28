@@ -2,19 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}AVISHU{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adaptive.css') }}">
 </head>
 <body
-    class="{% block body_class %}{% endblock %}"
+    class="{% block body_class %}{% endblock %}{% if current_user.is_authenticated %} av-has-bottom-nav{% endif %}"
     data-user-role="{{ current_user.role if current_user.is_authenticated else '' }}"
     data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}"
 >
+    {% set ep = request.endpoint %}
+
     <header class="av-header">
         <div class="av-shell av-header__inner">
             <a class="av-logo" href="{% if current_user.is_authenticated %}{% if current_user.role == 'client' %}{{ url_for('client.dashboard') }}{% elif current_user.role == 'franchisee' %}{{ url_for('franchisee.dashboard') }}{% elif current_user.role == 'production' %}{{ url_for('production.dashboard') }}{% else %}{{ url_for('auth.login') }}{% endif %}{% else %}{{ url_for('auth.login') }}{% endif %}">AVISHU</a>
-            <nav class="av-nav">
+
+            <nav class="av-nav av-nav--header" aria-label="Основная навигация">
                 {% if current_user.is_authenticated %}
                     {% if current_user.role == 'client' %}
                         <a href="{{ url_for('client.dashboard') }}">Витрина</a>
@@ -34,8 +38,60 @@
                     <a href="{{ url_for('auth.register') }}">Регистрация</a>
                 {% endif %}
             </nav>
+
+            <button type="button" class="av-nav-toggle" id="av-nav-toggle" aria-expanded="false" aria-controls="av-drawer" aria-label="Меню">
+                <span class="av-nav-toggle__lines" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </span>
+            </button>
         </div>
     </header>
+
+    <div class="av-drawer" id="av-drawer" aria-hidden="true">
+        <div class="av-drawer__backdrop" data-drawer-close></div>
+        <div class="av-drawer__panel" role="dialog" aria-modal="true" aria-label="Меню">
+            <div class="av-drawer__head">
+                <span class="av-h" style="font-size: 0.72rem; margin: 0;">Меню</span>
+                <button type="button" class="av-drawer__close" data-drawer-close aria-label="Закрыть">×</button>
+            </div>
+            <nav class="av-drawer__links">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'client' %}
+                        <a href="{{ url_for('client.dashboard') }}">Витрина</a>
+                        <a href="{{ url_for('client.cart') }}">Корзина{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+                        <a href="{{ url_for('client.orders') }}">Заказы</a>
+                    {% elif current_user.role == 'franchisee' %}
+                        <a href="{{ url_for('franchisee.dashboard') }}">Башня</a>
+                        <a href="{{ url_for('franchisee.orders') }}">Заказы</a>
+                    {% elif current_user.role == 'production' %}
+                        <a href="{{ url_for('production.dashboard') }}">Цех</a>
+                        <a href="{{ url_for('production.orders') }}">Очередь</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}">Выход</a>
+                    <p class="av-drawer__meta">{{ current_user.email }}</p>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Вход</a>
+                    <a href="{{ url_for('auth.register') }}">Регистрация</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <nav class="av-bottom-nav" aria-label="Быстрая навигация">
+        {% if current_user.role == 'client' %}
+            <a href="{{ url_for('client.dashboard') }}" {% if ep == 'client.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Витрина</a>
+            <a href="{{ url_for('client.cart') }}" {% if ep == 'client.cart' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Корзина</a>
+            <a href="{{ url_for('client.orders') }}" {% if ep == 'client.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Заказы</a>
+        {% elif current_user.role == 'franchisee' %}
+            <a href="{{ url_for('franchisee.dashboard') }}" {% if ep == 'franchisee.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Башня</a>
+            <a href="{{ url_for('franchisee.orders') }}" {% if ep == 'franchisee.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Заказы</a>
+        {% elif current_user.role == 'production' %}
+            <a href="{{ url_for('production.dashboard') }}" {% if ep == 'production.dashboard' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Цех</a>
+            <a href="{{ url_for('production.orders') }}" {% if ep == 'production.orders' %}aria-current="page"{% endif %}><span class="av-bottom-nav__dot" aria-hidden="true"></span>Очередь</a>
+        {% endif %}
+    </nav>
+    {% endif %}
 
     <main class="av-main av-shell">
         {% with messages = get_flashed_messages(with_categories=true) %}

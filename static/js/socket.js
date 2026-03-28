@@ -71,6 +71,25 @@
         return `<form method="post" action="/franchisee/orders/${orderId}/status" class="inline-form">${buttons}</form>`;
     }
 
+    function franchiseeActionCard(orderId, status) {
+        const next = FRANCHISEE_NEXT[status];
+        if (!next || !next.length) {
+            return '<span class="av-muted">—</span>';
+        }
+        const label = (s) => {
+            if (s === 'accepted') return 'ACCEPT';
+            if (s === 'in_production') return 'IN PRODUCTION';
+            return String(s).toUpperCase();
+        };
+        const buttons = next
+            .map(
+                (s) =>
+                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--accept av-btn--inverse av-btn--block">${label(s)}</button>`
+            )
+            .join('');
+        return `<form method="post" action="/franchisee/orders/${orderId}/status" class="inline-form">${buttons}</form>`;
+    }
+
     function productionActionCell(orderId, status) {
         const next = PRODUCTION_NEXT[status];
         if (!next || !next.length) {
@@ -79,7 +98,7 @@
         const buttons = next
             .map(
                 (s) =>
-                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--xl av-btn--inverse" style="background:#fff;color:#000;border-color:#fff;">Завершить: ${s}</button>`
+                    `<button type="submit" name="status" value="${s}" class="av-btn av-btn--xl av-btn--inverse av-btn--finish" style="background:#fff;color:#000;border-color:#fff;">ЗАВЕРШИТЬ</button>`
             )
             .join('');
         return `<form method="post" action="/production/orders/${orderId}/status" class="inline-form" style="flex-direction:column;width:100%;">${buttons}</form>`;
@@ -106,7 +125,8 @@
         const empty = wrap.querySelector('.empty-state');
         if (empty) empty.remove();
         wrap.innerHTML = `
-            <div class="av-table-wrap">
+            <div class="av-order-cards" id="client-order-cards"></div>
+            <div class="av-table-wrap av-table-desktop">
                 <table class="av-table">
                     <thead>
                         <tr>
@@ -121,9 +141,37 @@
                     <tbody id="client-orders-tbody"></tbody>
                 </table>
             </div>`;
-        const badge = document.querySelector('[data-client-order-count]');
-        if (badge) badge.textContent = '0';
         return document.getElementById('client-orders-tbody');
+    }
+
+    function upsertClientCard(order) {
+        if (userId !== order.user_id) return;
+        let container = document.getElementById('client-order-cards');
+        if (!container) {
+            ensureClientTable();
+            container = document.getElementById('client-order-cards');
+        }
+        if (!container) return;
+
+        let card = container.querySelector(`[data-order-id="${order.id}"]`);
+        if (!card) {
+            card = document.createElement('article');
+            card.className = 'av-order-card';
+            card.dataset.orderId = String(order.id);
+            container.insertBefore(card, container.firstChild);
+            const tbody = document.getElementById('client-orders-tbody');
+            if (!tbody || !tbody.querySelector(`tr[data-order-id="${order.id}"]`)) {
+                bumpClientCount(1);
+            }
+        }
+        card.innerHTML = `
+            <div class="av-order-card__top">
+                <span class="av-order-card__id">#${order.id}</span>
+                <span class="av-badge status">${escapeHtml(order.status)}</span>
+            </div>
+            <h3 class="av-order-card__title">${escapeHtml(order.product_name)}</h3>
+            <p class="av-order-card__meta">${escapeHtml(order.type)} · ${fmtDate(order.deadline)}</p>
+            <p class="av-order-card__meta">${fmtDateTime(order.created_at)}</p>`;
     }
 
     function bumpClientCount(delta) {
@@ -135,6 +183,7 @@
 
     function upsertClientRow(order) {
         if (userId !== order.user_id) return;
+        upsertClientCard(order);
         let tbody = document.getElementById('client-orders-tbody');
         if (!tbody) tbody = ensureClientTable();
         if (!tbody) return;
@@ -144,7 +193,6 @@
             row = document.createElement('tr');
             row.dataset.orderId = String(order.id);
             tbody.insertBefore(row, tbody.firstChild);
-            bumpClientCount(1);
         }
         row.innerHTML = `
             <td>#${order.id}</td>
@@ -187,7 +235,8 @@
         const empty = wrap.querySelector('.empty-state');
         if (empty) empty.remove();
         wrap.innerHTML = `
-            <div class="av-table-wrap">
+            <div class="av-order-cards" id="franchisee-order-cards"></div>
+            <div class="av-table-wrap av-table-desktop">
                 <table class="av-table">
                     <thead>
                         <tr>
@@ -204,12 +253,42 @@
                     <tbody id="franchisee-orders-tbody"></tbody>
                 </table>
             </div>`;
-        const badge = document.querySelector('[data-franchisee-order-count]');
-        if (badge) badge.textContent = '0';
         return document.getElementById('franchisee-orders-tbody');
     }
 
+    function upsertFranchiseeCard(order) {
+        let container = document.getElementById('franchisee-order-cards');
+        if (!container) {
+            ensureFranchiseeTable();
+            container = document.getElementById('franchisee-order-cards');
+        }
+        if (!container) return;
+        const email = order.client_email || '—';
+        let card = container.querySelector(`[data-order-id="${order.id}"]`);
+        if (!card) {
+            card = document.createElement('article');
+            card.className = 'av-order-card av-order-card--fr';
+            card.dataset.orderId = String(order.id);
+            container.insertBefore(card, container.firstChild);
+            const badge = document.querySelector('[data-franchisee-order-count]');
+            if (badge) {
+                const n = parseInt(badge.textContent, 10) || 0;
+                badge.textContent = String(n + 1);
+            }
+        }
+        card.innerHTML = `
+            <p class="av-order-card__id">#${order.id} · ${escapeHtml(email)}</p>
+            <h3 class="av-order-card__title">${escapeHtml(order.product_name)}</h3>
+            <div class="av-order-card__top">
+                <span class="av-muted">${escapeHtml(order.type)}</span>
+                <span class="av-badge js-order-status">${escapeHtml(order.status)}</span>
+            </div>
+            <p class="av-order-card__meta">${fmtDate(order.deadline)} · ${fmtDateTime(order.created_at)}</p>
+            <div class="av-order-card__actions js-franchisee-actions">${franchiseeActionCard(order.id, order.status)}</div>`;
+    }
+
     function upsertFranchiseeRow(order) {
+        upsertFranchiseeCard(order);
         let tbody = document.getElementById('franchisee-orders-tbody');
         if (!tbody) tbody = ensureFranchiseeTable();
         if (!tbody) return;
@@ -219,11 +298,6 @@
             row = document.createElement('tr');
             row.dataset.orderId = String(order.id);
             tbody.insertBefore(row, tbody.firstChild);
-            const badge = document.querySelector('[data-franchisee-order-count]');
-            if (badge) {
-                const n = parseInt(badge.textContent, 10) || 0;
-                badge.textContent = String(n + 1);
-            }
         }
         row.innerHTML = `
             <td>#${order.id}</td>
@@ -312,6 +386,13 @@
             if (cell) cell.textContent = order.status;
             const fa = row.querySelector('.js-franchisee-actions');
             if (fa) fa.innerHTML = franchiseeActionCell(order.id, order.status);
+        }
+        const frCard = document.querySelector(`#franchisee-order-cards [data-order-id="${order.id}"]`);
+        if (frCard) {
+            const st = frCard.querySelector('.js-order-status');
+            if (st) st.textContent = order.status;
+            const fa = frCard.querySelector('.js-franchisee-actions');
+            if (fa) fa.innerHTML = franchiseeActionCard(order.id, order.status);
         }
         const card = document.querySelector(`#production-active-wrap .av-queue [data-order-id="${order.id}"]`);
         if (card) {

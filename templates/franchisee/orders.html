@@ -13,7 +13,35 @@
 
 <div id="franchisee-orders-wrap">
 {% if orders %}
-    <div class="av-table-wrap">
+    <div class="av-order-cards" id="franchisee-order-cards">
+        {% for order in orders %}
+        {% set allowed = next_statuses_for_franchisee(order.status) %}
+        <article class="av-order-card av-order-card--fr" data-order-id="{{ order.id }}">
+            <p class="av-order-card__id">#{{ order.id }} · {{ order.user.email }}</p>
+            <h3 class="av-order-card__title">{{ order.product_name }}</h3>
+            <div class="av-order-card__top">
+                <span class="av-muted">{{ order.type }}</span>
+                <span class="av-badge js-order-status">{{ order.status }}</span>
+            </div>
+            <p class="av-order-card__meta">{{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }} · {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            <div class="av-order-card__actions js-franchisee-actions">
+                {% if allowed %}
+                <form method="post" action="{{ url_for('franchisee.update_order_status', order_id=order.id) }}" class="inline-form">
+                    {% for s in allowed %}
+                    <button type="submit" name="status" value="{{ s }}" class="av-btn av-btn--accept av-btn--inverse av-btn--block">
+                        {% if s == 'accepted' %}ACCEPT{% elif s == 'in_production' %}IN PRODUCTION{% else %}{{ s|upper }}{% endif %}
+                    </button>
+                    {% endfor %}
+                </form>
+                {% else %}
+                <span class="av-muted">—</span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="av-table-wrap av-table-desktop">
         <table class="av-table">
             <thead>
                 <tr>

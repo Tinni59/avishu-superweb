@@ -5,11 +5,19 @@
 {% block content %}
 <div class="av-section-head">
     <h2>Корзина</h2>
-    <a class="av-muted" href="{{ url_for('client.dashboard') }}">← Витрина</a>
+    <a class="av-muted" href="{{ url_for('client.dashboard') }}">Витрина</a>
 </div>
 
 {% if cart %}
-    <div class="av-table-wrap" style="margin-bottom: 2rem;">
+    <div class="av-order-cards" style="margin-bottom: 2rem;">
+        {% for line in cart %}
+        <article class="av-order-card">
+            <h3 class="av-order-card__title">{{ line.product_name }}</h3>
+            <p class="av-order-card__meta">{{ line.type }} · {% if line.deadline %}{{ line.deadline[:10] }}{% else %}—{% endif %}</p>
+        </article>
+        {% endfor %}
+    </div>
+    <div class="av-table-wrap av-table-desktop" style="margin-bottom: 2rem;">
         <table class="av-table">
             <thead>
                 <tr>
@@ -30,10 +38,10 @@
         </table>
     </div>
     <form method="post" action="{{ url_for('client.checkout_cart') }}">
-        <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block" style="max-width: 420px;">Оформить заказ</button>
+        <button type="submit" class="av-btn av-btn--lg av-btn--inverse av-btn--block">Оформить заказ</button>
     </form>
 {% else %}
     <p class="av-muted">Корзина пуста.</p>
-    <a class="av-btn av-btn--lg" href="{{ url_for('client.dashboard') }}">На витрину</a>
+    <a class="av-btn av-btn--lg av-btn--inverse" href="{{ url_for('client.dashboard') }}">На витрину</a>
 {% endif %}
 {% endblock %}

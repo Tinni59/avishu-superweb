@@ -40,7 +40,21 @@
 
 <div id="client-orders-table-wrap">
 {% if orders %}
-    <div class="av-table-wrap">
+    <div class="av-order-cards" id="client-order-cards">
+        {% for order in orders %}
+        <article class="av-order-card" data-order-id="{{ order.id }}">
+            <div class="av-order-card__top">
+                <span class="av-order-card__id">#{{ order.id }}</span>
+                <span class="av-badge status">{{ order.status }}</span>
+            </div>
+            <h3 class="av-order-card__title">{{ order.product_name }}</h3>
+            <p class="av-order-card__meta">{{ order.type }} · {{ order.deadline.strftime('%Y-%m-%d') if order.deadline else '—' }}</p>
+            <p class="av-order-card__meta">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="av-table-wrap av-table-desktop">
         <table class="av-table">
             <thead>
                 <tr>
