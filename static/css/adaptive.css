@@ -246,8 +246,21 @@ body.av-has-bottom-nav {
     min-height: min(56vh, 520px);
     align-content: center;
     text-align: center;
-    padding: var(--av-space-lg);
+    padding: 0;
     margin-bottom: var(--av-space-lg);
+}
+
+.av-hero--banner {
+    padding: 0;
+    align-content: stretch;
+    text-align: center;
+}
+
+.av-hero__content {
+    align-items: center;
+    text-align: center;
+    min-height: min(56vh, 520px);
+    padding: var(--av-space-lg);
 }
 
 .av-hero__title {
@@ -619,6 +632,17 @@ body.av-has-bottom-nav {
         text-align: left;
         align-content: end;
         min-height: min(64vh, 680px);
+    }
+
+    .av-hero--banner {
+        align-content: stretch;
+    }
+
+    .av-hero__content {
+        text-align: left;
+        align-items: flex-start;
+        min-height: min(64vh, 680px);
+        padding: clamp(2rem, 5vw, 4rem);
     }
 
     .av-hero__lead {

@@ -3,11 +3,23 @@
 {% block title %}{{ t('client_showcase_title') }}{% endblock %}
 
 {% block content %}
-<section class="av-hero">
-    <p class="av-hero__kicker">{{ t('hero_kicker') }}</p>
-    <h1 class="av-hero__title">{{ t('hero_title') }}</h1>
-    <p class="av-hero__lead">{{ t('hero_lead') }}</p>
-    <a class="av-btn av-btn--inverse" href="#catalog">{{ t('hero_cta') }}</a>
+<section class="av-hero{% if banner.desktop or banner.mobile %} av-hero--banner{% endif %}">
+    {% if banner.desktop or banner.mobile %}
+    <div class="av-hero__media" aria-hidden="true">
+        {% if banner.desktop %}
+        <img class="av-hero__img av-hero__img--desktop" src="{{ banner.desktop }}" alt="" width="1920" height="640" fetchpriority="high" decoding="async">
+        {% endif %}
+        {% if banner.mobile %}
+        <img class="av-hero__img av-hero__img--mobile" src="{{ banner.mobile }}" alt="" width="800" height="1000" fetchpriority="high" decoding="async">
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="av-hero__content">
+        <p class="av-hero__kicker">{{ t('hero_kicker') }}</p>
+        <h1 class="av-hero__title">{{ t('hero_title') }}</h1>
+        <p class="av-hero__lead">{{ t('hero_lead') }}</p>
+        <a class="av-btn av-btn--inverse" href="#catalog">{{ t('hero_cta') }}</a>
+    </div>
 </section>
 
 <section id="catalog">

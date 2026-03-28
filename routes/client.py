@@ -4,6 +4,7 @@ from flask import Blueprint, flash, redirect, render_template, request, session,
 from flask_login import current_user, login_required
 
 from i18n import flash_message, normalize_locale
+from banner import get_showcase_banner_urls
 from catalog import get_catalog
 from extensions import db
 from models import Order
@@ -50,7 +51,11 @@ def _create_order_for_user(product_name: str, order_type: str, deadline):
 @login_required
 @role_required("client")
 def dashboard():
-    return render_template("client/dashboard.html", catalog=get_catalog())
+    return render_template(
+        "client/dashboard.html",
+        catalog=get_catalog(),
+        banner=get_showcase_banner_urls(),
+    )
 
 
 @client_bp.route("/products")
