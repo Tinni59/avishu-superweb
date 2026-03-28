@@ -58,8 +58,9 @@ def update_status(order_id):
         )
         return redirect(url_for("production.orders"))
 
+    previous_status = order.status
     order.status = new_status
     db.session.commit()
-    emit_order_updated(order, current_user.role)
+    emit_order_updated(order, current_user.role, previous_status=previous_status)
     flash("Статус заказа обновлён.", "success")
     return redirect(url_for("production.orders"))

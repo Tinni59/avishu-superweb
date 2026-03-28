@@ -8,13 +8,13 @@
     <a class="av-muted" href="{{ url_for('client.dashboard') }}">Витрина</a>
 </div>
 
-<section class="av-loyalty">
+<section class="av-loyalty" id="client-loyalty" data-order-total="{{ orders|length }}">
     <h3 class="av-h" style="font-size: 0.72rem;">Программа лояльности</h3>
     <p class="av-muted" style="margin: 0;">Базовый уровень — накопление по числу заказов</p>
     <div class="av-loyalty__bar" role="progressbar" aria-valuenow="{{ loyalty_pct }}" aria-valuemin="0" aria-valuemax="100">
-        <div class="av-loyalty__fill" style="width: {{ loyalty_pct }}%;"></div>
+        <div class="av-loyalty__fill" id="client-loyalty-fill" style="width: {{ loyalty_pct }}%;"></div>
     </div>
-    <p class="av-muted" style="margin: 0.75rem 0 0; font-size: 0.7rem;">{{ loyalty_pct }}% до следующего уровня (демо)</p>
+    <p class="av-muted" id="client-loyalty-label" style="margin: 0.75rem 0 0; font-size: 0.7rem;"><span id="client-loyalty-pct">{{ loyalty_pct }}</span>% до следующего уровня (демо)</p>
 </section>
 
 {% if orders %}

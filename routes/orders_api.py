@@ -134,7 +134,8 @@ def order_detail(order_id):
     else:
         return jsonify({"error": "Изменение статуса недоступно."}), 403
 
+    previous_status = order.status
     order.status = new_status
     db.session.commit()
-    emit_order_updated(order, current_user.role)
+    emit_order_updated(order, current_user.role, previous_status=previous_status)
     return jsonify({"order": order.to_dict()})

@@ -31,22 +31,22 @@
 </div>
 <p class="av-muted" style="margin: -1.5rem 0 2rem; font-size: 0.72rem;">Заказы по дате создания в выбранном периоде</p>
 
-<div class="av-kanban">
-    <div class="av-kanban__col">
+<div class="av-kanban" id="franchisee-kanban" data-franchisee-period="{{ stats_period }}">
+    <div class="av-kanban__col" data-funnel-status="created">
         <div class="av-kanban__head">Новые</div>
-        <div class="av-kanban__count">{{ order_counts.created }}</div>
+        <div class="av-kanban__count" data-kanban-count="created">{{ order_counts.created }}</div>
     </div>
-    <div class="av-kanban__col">
+    <div class="av-kanban__col" data-funnel-status="accepted">
         <div class="av-kanban__head">Принято</div>
-        <div class="av-kanban__count">{{ order_counts.accepted }}</div>
+        <div class="av-kanban__count" data-kanban-count="accepted">{{ order_counts.accepted }}</div>
     </div>
-    <div class="av-kanban__col">
+    <div class="av-kanban__col" data-funnel-status="in_production">
         <div class="av-kanban__head">В работе</div>
-        <div class="av-kanban__count">{{ order_counts.in_production }}</div>
+        <div class="av-kanban__count" data-kanban-count="in_production">{{ order_counts.in_production }}</div>
     </div>
-    <div class="av-kanban__col">
+    <div class="av-kanban__col" data-funnel-status="done">
         <div class="av-kanban__head">Готово</div>
-        <div class="av-kanban__count">{{ order_counts.done }}</div>
+        <div class="av-kanban__count" data-kanban-count="done">{{ order_counts.done }}</div>
     </div>
 </div>
 

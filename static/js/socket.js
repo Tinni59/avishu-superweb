@@ -51,6 +51,80 @@
         return `${y}-${m}-${day} ${h}:${min}`;
     };
 
+    function periodStartUtc(period) {
+        const now = new Date();
+        if (period === 'today') {
+            return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0);
+        }
+        if (period === 'month') {
+            return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0);
+        }
+        return Date.now() - 7 * 24 * 60 * 60 * 1000;
+    }
+
+    function orderInFranchiseePeriod(order, period) {
+        if (!order || !order.created_at) return false;
+        const t = new Date(order.created_at).getTime();
+        return t >= periodStartUtc(period);
+    }
+
+    function bumpKanban(status, delta) {
+        const el = document.querySelector(`[data-kanban-count="${status}"]`);
+        if (!el) return;
+        const n = Math.max(0, (parseInt(el.textContent, 10) || 0) + delta);
+        el.textContent = String(n);
+    }
+
+    function applyFranchiseeKanban(prev, next, order) {
+        const root = document.getElementById('franchisee-kanban');
+        if (!root || !order) return;
+        const period = root.dataset.franchiseePeriod || 'week';
+        if (!orderInFranchiseePeriod(order, period)) return;
+        if (prev && next && prev !== next) {
+            bumpKanban(prev, -1);
+            bumpKanban(next, 1);
+        }
+    }
+
+    function bumpFranchiseeKanbanNewOrder(order) {
+        const root = document.getElementById('franchisee-kanban');
+        if (!root || !order) return;
+        const period = root.dataset.franchiseePeriod || 'week';
+        if (!orderInFranchiseePeriod(order, period)) return;
+        bumpKanban('created', 1);
+    }
+
+    function bumpProdStat(key, delta) {
+        const el = document.querySelector(`[data-prod-stat="${key}"]`);
+        if (!el) return;
+        const n = Math.max(0, (parseInt(el.textContent, 10) || 0) + delta);
+        el.textContent = String(n);
+    }
+
+    function moveProductionDashboardStats(prev, next) {
+        if (!document.getElementById('production-stats') || !prev || !next || prev === next) return;
+        if (prev === 'accepted') bumpProdStat('requested', -1);
+        else if (prev === 'in_production') bumpProdStat('in_progress', -1);
+        else if (prev === 'done') bumpProdStat('completed', -1);
+
+        if (next === 'accepted') bumpProdStat('requested', 1);
+        else if (next === 'in_production') bumpProdStat('in_progress', 1);
+        else if (next === 'done') bumpProdStat('completed', 1);
+    }
+
+    function syncClientLoyaltyFromCount() {
+        const badge = document.querySelector('[data-client-order-count]');
+        const loyaltyRoot = document.getElementById('client-loyalty');
+        if (!badge || !loyaltyRoot) return;
+        const total = parseInt(badge.textContent, 10) || 0;
+        const pct = Math.min(100, total * 12 + 8);
+        const fill = document.getElementById('client-loyalty-fill');
+        const pctEl = document.getElementById('client-loyalty-pct');
+        if (fill) fill.style.width = `${pct}%`;
+        if (pctEl) pctEl.textContent = String(pct);
+        loyaltyRoot.setAttribute('data-order-total', String(total));
+    }
+
     const FRANCHISEE_NEXT = {
         created: ['accepted'],
         accepted: ['in_production'],
@@ -434,12 +508,14 @@
 
         if (role === 'client' && userId === order.user_id) {
             upsertClientRow(order);
+            syncClientLoyaltyFromCount();
             showAlert(`Заказ #${order.id} создан`);
             return;
         }
 
         if (role === 'franchisee') {
             upsertFranchiseeRow(order);
+            bumpFranchiseeKanbanNewOrder(order);
             showAlert(`Новый заказ #${order.id}`);
             return;
         }
@@ -452,21 +528,29 @@
     socket.on('order_updated', (payload) => {
         const order = payload && payload.order;
         if (!order) return;
+        const prev = payload.previous_status;
 
         if (role === 'client' && userId === order.user_id) {
             upsertClientRow(order);
             updateClientTrack(order);
+            syncClientLoyaltyFromCount();
             showAlert(`Заказ #${order.id}: ${order.status}`);
             return;
         }
 
         if (role === 'franchisee') {
             upsertFranchiseeRow(order);
+            if (prev) {
+                applyFranchiseeKanban(prev, order.status, order);
+            }
             showAlert(`Заказ #${order.id}: ${order.status}`);
             return;
         }
 
         if (role === 'production') {
+            if (prev) {
+                moveProductionDashboardStats(prev, order.status);
+            }
             if (order.status === 'done') {
                 removeProductionActiveRow(order.id);
                 appendProductionDone(order);

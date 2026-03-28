@@ -1,5 +1,7 @@
 """Socket.IO: order_created / order_updated (WebSocket only, без polling)."""
 
+from typing import Optional
+
 from extensions import db, socketio
 from models import User
 
@@ -24,11 +26,12 @@ def emit_order_created(order, actor_role: str):
     socketio.emit("order_created", payload, room="role:production")
 
 
-def emit_order_updated(order, actor_role: str):
+def emit_order_updated(order, actor_role: str, previous_status: Optional[str] = None):
     base = {
         "message": "Order updated",
         "order": _order_dict(order),
         "actor_role": actor_role,
+        "previous_status": previous_status,
     }
     socketio.emit("order_updated", base, room=f"user:{order.user_id}")
     socketio.emit("order_updated", base, room="role:franchisee")

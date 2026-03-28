@@ -9,20 +9,20 @@
     <p>Очередь задач на пошив. Крупные кнопки — минимум текста. Статус пишется в базу при нажатии.</p>
 </section>
 
-<div class="av-prod-stats">
+<div class="av-prod-stats" id="production-stats">
     <article class="av-prod-stat">
         <p class="av-prod-stat__label">Запрос</p>
-        <p class="av-prod-stat__val">{{ stats.requested }}</p>
+        <p class="av-prod-stat__val" data-prod-stat="requested">{{ stats.requested }}</p>
         <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">Ожидают (accepted)</p>
     </article>
     <article class="av-prod-stat">
         <p class="av-prod-stat__label">В процессе</p>
-        <p class="av-prod-stat__val">{{ stats.in_progress }}</p>
+        <p class="av-prod-stat__val" data-prod-stat="in_progress">{{ stats.in_progress }}</p>
         <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">Пошив (in_production)</p>
     </article>
     <article class="av-prod-stat">
         <p class="av-prod-stat__label">Завершено</p>
-        <p class="av-prod-stat__val">{{ stats.completed }}</p>
+        <p class="av-prod-stat__val" data-prod-stat="completed">{{ stats.completed }}</p>
         <p class="av-muted" style="margin: 0; font-size: 0.65rem; letter-spacing: 0.08em;">Готово (done)</p>
     </article>
 </div>
