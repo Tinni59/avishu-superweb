@@ -1,10 +1,3 @@
-"""
-Каталог витрины: обнаружение изображений в папках static (см. CATALOG_STATIC_DIRS).
-
-Имена файлов: «Название 1.jpg», «Название 2.jpg», …
-→ название товара: «Название» (без номера в конце)
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -14,7 +7,6 @@ from urllib.parse import quote
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# Папки относительно static/ (можно несколько)
 CATALOG_STATIC_DIRS = (
     Path("images") / "catalog",
     Path("catalog images"),
@@ -22,7 +14,6 @@ CATALOG_STATIC_DIRS = (
 
 ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 
-# Метаданные по slug (12 hex от названия)
 PRODUCT_META: dict[str, dict] = {}
 
 DEFAULT_META = {
@@ -38,17 +29,14 @@ def _stable_id(name: str) -> str:
 
 
 def _static_url(relative_under_static: Path) -> str:
-    """URL для файла под static/: /static/... с кодированием."""
     parts = relative_under_static.parts
     encoded = "/".join(quote(p, safe="") for p in parts)
     return f"/static/{encoded}"
 
 
 def discover_catalog_from_filesystem() -> list[dict]:
-    """Группирует файлы «Имя N.ext» по «Имя», сортирует по N."""
     static_root = BASE_DIR / "static"
     stem_pat = re.compile(r"^(.+?)\s+(\d+)$")
-    # name -> list of (num, relpath_from_static, filename)
     groups: dict[str, list[tuple[int, Path, str]]] = {}
 
     for sub in CATALOG_STATIC_DIRS:
@@ -90,7 +78,6 @@ def discover_catalog_from_filesystem() -> list[dict]:
 
 
 def get_catalog() -> list[dict]:
-    """Сначала каталог из БД (если есть строки), иначе с диска."""
     try:
         from models import CatalogProduct
 

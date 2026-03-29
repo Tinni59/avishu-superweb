@@ -1,15 +1,3 @@
-"""
-Одноразовый импорт каталога в БД из static/images/catalog/
-
-Запуск: python seed_catalog.py
-(из корня проекта, после pip install -r requirements.txt)
-
-Правила имён файлов: «Название 1.jpg», «Название 2.jpg», …
-Папки: static/images/catalog/ и/или static/catalog images/
-Название товара в БД — «Название» (без номера).
-Если таблица уже заполнена — скрипт выходит без изменений.
-"""
-
 import json
 
 from app import create_app

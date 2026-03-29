@@ -1,4 +1,4 @@
-"""Переключение светлой/тёмной темы (cookie)."""
+"""Переключение светлой/тёмной темы (черееез cookie). Да, мы крутые :)"""
 
 from flask import Blueprint, redirect, request, url_for
 
