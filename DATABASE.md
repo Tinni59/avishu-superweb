@@ -12,11 +12,11 @@
 
 Пользователи и роли (`flask_login`).
 
-| Колонка   | Тип           | Ограничения        | Описание |
-|-----------|---------------|--------------------|----------|
-| `id`      | INTEGER       | PK, autoincrement  | Идентификатор |
-| `email`   | VARCHAR(255)  | UNIQUE, NOT NULL, индекс | Email (логин) |
-| `password`| VARCHAR(255)  | NOT NULL           | Хэш пароля (werkzeug) |
+| Колонка   | Тип           | Ограничения        | Описание                                      |
+|-----------|---------------|--------------------|-----------------------------------------------|
+| `id`      | INTEGER       | PK, autoincrement  | Идентификатор                                 |
+| `email`   | VARCHAR(255)  | UNIQUE, NOT NULL, индекс | Email (логин)                                 |
+| `password`| VARCHAR(255)  | NOT NULL           | Хэш пароля (werkzeug)                         |
 | `role`    | VARCHAR(32)   | NOT NULL, индекс   | Одна из: `client`, `franchisee`, `production` |
 
 **Связи:** один ко многим с `order` (`user.id` ← `order.user_id`, каскадное удаление дочерних заказов при удалении пользователя — см. `models.py`).
@@ -27,15 +27,15 @@
 
 Заказы клиентов.
 
-| Колонка        | Тип           | Ограничения | Описание |
-|----------------|---------------|-------------|----------|
-| `id`           | INTEGER       | PK          | Номер заказа |
-| `user_id`      | INTEGER       | FK → `user.id`, NOT NULL, индекс | Владелец (клиент) |
-| `product_name` | VARCHAR(255)  | NOT NULL    | Название изделия |
-| `type`         | VARCHAR(32)   | NOT NULL    | Тип: `in_stock`, `preorder` |
-| `status`       | VARCHAR(32)   | NOT NULL, default `created`, индекс | См. статусы ниже |
-| `deadline`     | DATETIME      | NULL        | Срок (обязателен для `preorder`) |
-| `created_at`   | DATETIME      | NOT NULL, default UTC now | Время создания |
+| Колонка        | Тип           | Ограничения | Описание                                |
+|----------------|---------------|-------------|-----------------------------------------|
+| `id`           | INTEGER       | PK          | Номер заказа                            |
+| `user_id`      | INTEGER       | FK → `user.id`, NOT NULL, индекс | Владелец (клиент)                       |
+| `product_name` | VARCHAR(255)  | NOT NULL    | Название изделия                        |
+| `type`         | VARCHAR(32)   | NOT NULL    | Тип: `in_stock`, `preorder`             |
+| `status`       | VARCHAR(32)   | NOT NULL, default `created`, индекс | См. статусы ниже                        |
+| `deadline`     | DATETIME      | NULL        | Срок (обязателен для `preorder`)        |
+| `created_at`   | DATETIME      | NOT NULL, default UTC now | Время создания                          |
 
 ### Значения `order.type`
 
@@ -58,17 +58,17 @@
 
 Опциональное хранение позиций витрины (альтернатива — только файлы в `static/`, см. `catalog.py` / `seed_catalog.py`).
 
-| Колонка        | Тип           | Ограничения | Описание |
-|----------------|---------------|-------------|----------|
-| `id`           | INTEGER       | PK          | Внутренний id |
-| `slug`         | VARCHAR(64)   | UNIQUE, NOT NULL, индекс | Стабильный ключ карточки |
-| `name`         | VARCHAR(255)  | NOT NULL    | Название |
-| `line`         | VARCHAR(128)  | NOT NULL, default | Линейка / коллекция |
-| `product_type` | VARCHAR(32)   | NOT NULL, default `in_stock` | `in_stock` / `preorder` |
-| `price`        | VARCHAR(64)   | NOT NULL    | Отображаемая цена (строка) |
-| `detail`       | TEXT          | NULL        | Описание |
-| `sort_order`   | INTEGER       | NOT NULL, default 0 | Порядок сортировки |
-| `images_json`  | TEXT          | NOT NULL, default `[]` | JSON-массив URL путей к изображениям |
+| Колонка        | Тип           | Ограничения | Описание                                        |
+|----------------|---------------|-------------|-------------------------------------------------|
+| `id`           | INTEGER       | PK          | Внутренний id                                   |
+| `slug`         | VARCHAR(64)   | UNIQUE, NOT NULL, индекс | Стабильный ключ карточки                        |
+| `name`         | VARCHAR(255)  | NOT NULL    | Название                                        |
+| `line`         | VARCHAR(128)  | NOT NULL, default | Линейка / коллекция                             |
+| `product_type` | VARCHAR(32)   | NOT NULL, default `in_stock` | `in_stock` / `preorder`                         |
+| `price`        | VARCHAR(64)   | NOT NULL    | Отображаемая цена (строка)                      |
+| `detail`       | TEXT          | NULL        | Описание                                        |
+| `sort_order`   | INTEGER       | NOT NULL, default 0 | Порядок сортировки                              |
+| `images_json`  | TEXT          | NOT NULL, default `[]` | JSON-массив URL путей к изображениям            |
 
 ---
 

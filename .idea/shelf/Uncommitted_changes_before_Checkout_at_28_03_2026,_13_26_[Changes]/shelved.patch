@@ -1,0 +1,16 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\"\"\"Единственная точка входа: `python main.py` или `flask --app main run`.\"\"\"\n\nfrom app import create_app\nfrom extensions import socketio\n\napp = create_app()\n\nif __name__ == \"__main__\":\n    socketio.run(app, debug=True)\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision 2747caade2efe70f13841c5bd3d19bbbd060aaa0)
++++ b/main.py	(date 1774621383678)
+@@ -6,4 +6,4 @@
+ app = create_app()
+ 
+ if __name__ == "__main__":
+-    socketio.run(app, debug=True)
++    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
